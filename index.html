@@ -3,706 +3,987 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🍳 今天做什么菜</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>BeYourChef · 今天做什么菜</title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
     <style>
-        * { touch-action: manipulation; }
-        body { background: #f7f3f0; font-family: system-ui, -apple-system, sans-serif; }
-        .slide-panel { transition: all 0.3s ease; }
-        .card-hover:active { transform: scale(0.98); }
-        .badge { font-size: 11px; padding: 2px 10px; border-radius: 20px; }
-        .glass { background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); }
-        .tab-active { border-bottom: 3px solid #f97316; color: #f97316; font-weight: 600; }
-        .fade-in { animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-        .dish-card { border-left: 4px solid #f97316; }
-        .ingredient-tag { background: #fef3c7; color: #92400e; padding: 2px 12px; border-radius: 16px; font-size: 13px; display: inline-block; margin: 3px 4px 3px 0; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .category-header { background: #f0f0f0; border-radius: 12px; padding: 6px 14px; margin: 8px 0 6px 0; font-size: 14px; font-weight: 600; color: #555; display: flex; justify-content: space-between; align-items: center; }
-        .fridge-item { background: white; padding: 6px 14px; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: inline-block; margin: 4px 6px 4px 0; cursor: pointer; transition: 0.1s; }
-        .fridge-item:active { background: #fee2e2; }
-        .fridge-item .del { margin-left: 6px; color: #f87171; font-weight: bold; }
+        * {
+            touch-action: manipulation;
+        }
+        body {
+            background: #f7f3f0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .slide-panel {
+            transition: all 0.3s ease;
+        }
+        .card-hover:active {
+            transform: scale(0.98);
+        }
+        .badge {
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+        }
+        .tab-active {
+            border-bottom: 3px solid #f97316;
+            color: #f97316;
+            font-weight: 600;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .dish-card {
+            border-left: 4px solid #f97316;
+        }
+        .ingredient-tag {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 2px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            display: inline-block;
+            margin: 3px 4px 3px 0;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .category-header {
+            background: #f0f0f0;
+            border-radius: 12px;
+            padding: 6px 14px;
+            margin: 8px 0 6px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .fridge-item {
+            background: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            display: inline-block;
+            margin: 4px 6px 4px 0;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .fridge-item:active {
+            background: #fee2e2;
+        }
+        .fridge-item .del {
+            margin-left: 6px;
+            color: #f87171;
+            font-weight: bold;
+        }
+        .recipe-cat-tag {
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 0px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            display: inline-block;
+            margin-left: 8px;
+        }
+        .menu-item-remove {
+            color: #f87171;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0 6px;
+            font-size: 18px;
+            line-height: 1;
+        }
+        .menu-item-remove:hover {
+            color: #dc2626;
+        }
+        .btn-added {
+            background-color: #9ca3af !important;
+            cursor: default !important;
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
 
-<div id="app" class="max-w-lg mx-auto px-4 pb-24 pt-4 min-h-screen">
-    
-    <!-- ===== 顶部标题 ===== -->
-    <div class="flex items-center justify-between mb-4">
-        <h1 class="text-2xl font-bold text-orange-600">🍳 今天做什么菜</h1>
-        <div class="flex gap-2">
-            <button onclick="exportData()" class="text-sm bg-gray-200 px-3 py-1 rounded-full">📤导出</button>
-            <button onclick="document.getElementById('importInput').click()" class="text-sm bg-gray-200 px-3 py-1 rounded-full">📥导入</button>
-            <input type="file" id="importInput" accept=".json" class="hidden" onchange="importData(event)">
-        </div>
-    </div>
+    <div id="app" class="max-w-lg mx-auto px-4 pb-24 pt-4 min-h-screen">
 
-    <!-- ===== Tab导航 ===== -->
-    <div class="flex bg-white rounded-2xl shadow-sm p-1 mb-4 overflow-x-auto no-scrollbar">
-        <button class="tab-btn flex-1 py-2 text-center text-sm rounded-xl transition" data-tab="fridge" onclick="switchTab('fridge')">🧊 冰箱</button>
-        <button class="tab-btn flex-1 py-2 text-center text-sm rounded-xl transition" data-tab="recipes" onclick="switchTab('recipes')">📖 菜谱</button>
-        <button class="tab-btn flex-1 py-2 text-center text-sm rounded-xl transition" data-tab="recommend" onclick="switchTab('recommend')">✨ 推荐</button>
-        <button class="tab-btn flex-1 py-2 text-center text-sm rounded-xl transition" data-tab="menu" onclick="switchTab('menu')">📋 今日菜单</button>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- TAB 1: 冰箱（新分类版） -->
-    <!-- ============================================================ -->
-    <div id="tab-fridge" class="tab-content fade-in">
-        <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
-            <div class="flex gap-2 flex-wrap">
-                <input id="fridgeInput" placeholder="食材名称" class="flex-1 min-w-[120px] border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
-                <select id="categorySelect" class="border rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-300">
-                    <!-- 由JS动态渲染 -->
-                </select>
-                <button onclick="addFridgeItem()" class="bg-orange-500 text-white px-5 py-2 rounded-xl text-sm font-medium">添加</button>
-            </div>
-            <button onclick="openCategoryManager()" class="mt-2 text-xs text-gray-400 underline">管理分类</button>
-        </div>
-        <div id="fridgeList" class="flex flex-col gap-1">
-            <!-- 动态渲染分组 -->
-        </div>
-        <p class="text-xs text-gray-400 mt-3 text-center">点击食材可移动分类 · 点击 ✕ 删除</p>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- TAB 2: 菜谱库 -->
-    <!-- ============================================================ -->
-    <div id="tab-recipes" class="tab-content fade-in hidden">
-        <button onclick="showAddRecipe()" class="w-full bg-orange-500 text-white py-3 rounded-2xl font-medium mb-4">➕ 添加自定义菜谱</button>
-        <div id="recipeList" class="space-y-3">
-            <!-- 动态渲染 -->
-        </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- TAB 3: 推荐 -->
-    <!-- ============================================================ -->
-    <div id="tab-recommend" class="tab-content fade-in hidden">
-        <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
-            <p class="text-sm text-gray-500">基于冰箱现有食材，推荐匹配度最高的菜品</p>
-        </div>
-        <div id="recommendList" class="space-y-3">
-            <!-- 动态渲染 -->
-        </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- TAB 4: 今日菜单 -->
-    <!-- ============================================================ -->
-    <div id="tab-menu" class="tab-content fade-in hidden">
-        <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
-            <div class="flex items-center gap-3 flex-wrap">
-                <label class="text-sm font-medium">今天吃几个菜？</label>
-                <input id="dishCount" type="number" value="2" min="1" max="6" class="w-16 border rounded-xl px-3 py-1 text-center">
-                <button onclick="generateRandomMenu()" class="bg-orange-500 text-white px-5 py-2 rounded-xl text-sm font-medium">🎲 随机生成</button>
-                <button onclick="showManualSelect()" class="bg-blue-500 text-white px-5 py-2 rounded-xl text-sm font-medium">✋ 手动选菜</button>
+        <!-- ===== 顶部标题 ===== -->
+        <div class="flex items-center justify-between mb-4">
+            <h1 class="text-2xl font-bold text-orange-600">🍳 BeYourChef</h1>
+            <div class="flex gap-2">
+                <button onclick="exportData()" class="text-sm bg-gray-200 px-3 py-1 rounded-full">📤导出</button>
+                <button onclick="document.getElementById('importInput').click()" class="text-sm bg-gray-200 px-3 py-1 rounded-full">📥导入</button>
+                <input type="file" id="importInput" accept=".json" class="hidden" onchange="importData(event)">
             </div>
         </div>
-        <div id="todayMenu" class="bg-white rounded-2xl p-4 shadow-sm"></div>
-        <div id="shoppingList" class="mt-4 bg-white rounded-2xl p-4 shadow-sm"></div>
+
+        <!-- ===== Tab导航 ===== -->
+        <div class="flex bg-white rounded-2xl shadow-sm p-1 mb-4 overflow-x-auto no-scrollbar">
+            <button class="tab-btn flex-1 py-2 text-center text-sm rounded-xl transition" data-tab="fridge" onclick="switchTab('fridge')">🧊 冰箱</button>
+            <button class="tab-btn flex-1 py-2 text-center text-sm rounded-xl transition" data-tab="recipes" onclick="switchTab('recipes')">📖 菜谱</button>
+            <button class="tab-btn flex-1 py-2 text-center text-sm rounded-xl transition" data-tab="recommend" onclick="switchTab('recommend')">✨ 推荐</button>
+            <button class="tab-btn flex-1 py-2 text-center text-sm rounded-xl transition" data-tab="menu" onclick="switchTab('menu')">📋 今日菜单</button>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB 1: 冰箱 -->
+        <!-- ============================================================ -->
+        <div id="tab-fridge" class="tab-content fade-in">
+            <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+                <div class="flex gap-2 flex-wrap">
+                    <input id="fridgeInput" placeholder="食材名称" class="flex-1 min-w-[120px] border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
+                    <select id="categorySelect" class="border rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-300">
+                        <!-- 由JS动态渲染 -->
+                    </select>
+                    <button onclick="addFridgeItem()" class="bg-orange-500 text-white px-5 py-2 rounded-xl text-sm font-medium">添加</button>
+                </div>
+                <button onclick="openCategoryManager('fridge')" class="mt-2 text-xs text-gray-400 underline">管理分类</button>
+            </div>
+            <div id="fridgeList" class="flex flex-col gap-1">
+                <!-- 动态渲染分组 -->
+            </div>
+            <p class="text-xs text-gray-400 mt-3 text-center">点击食材可移动分类 · 点击 ✕ 删除</p>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB 2: 菜谱库（带分类） -->
+        <!-- ============================================================ -->
+        <div id="tab-recipes" class="tab-content fade-in hidden">
+            <div class="flex gap-2 mb-3 flex-wrap">
+                <button onclick="showAddRecipe()" class="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm font-medium flex-1">➕ 添加菜谱</button>
+                <button onclick="openCategoryManager('recipe')" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium">📂 管理分类</button>
+            </div>
+            <div id="recipeCategoryFilter" class="flex gap-2 overflow-x-auto no-scrollbar pb-2 mb-2">
+                <!-- 由JS动态渲染分类筛选标签 -->
+            </div>
+            <div id="recipeList" class="space-y-3">
+                <!-- 动态渲染 -->
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB 3: 推荐 -->
+        <!-- ============================================================ -->
+        <div id="tab-recommend" class="tab-content fade-in hidden">
+            <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+                <p class="text-sm text-gray-500">基于冰箱现有食材，推荐匹配度最高的菜品</p>
+            </div>
+            <div id="recommendList" class="space-y-3">
+                <!-- 动态渲染 -->
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB 4: 今日菜单（优化版） -->
+        <!-- ============================================================ -->
+        <div id="tab-menu" class="tab-content fade-in hidden">
+            <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+                <div class="flex items-center gap-3 flex-wrap">
+                    <label class="text-sm font-medium">今天吃几个菜？</label>
+                    <input id="dishCount" type="number" value="3" min="1" max="6" class="w-16 border rounded-xl px-3 py-1 text-center">
+                </div>
+                <div class="flex gap-2 mt-2">
+                    <button onclick="generateRandomMenu()" class="flex-1 bg-orange-500 text-white px-5 py-2 rounded-xl text-sm font-medium">🎲 随机生成</button>
+                    <button onclick="showManualSelect()" class="flex-1 bg-blue-500 text-white px-5 py-2 rounded-xl text-sm font-medium">✋ 手动选菜</button>
+                </div>
+            </div>
+            <div id="todayMenu" class="bg-white rounded-2xl p-4 shadow-sm">
+                <!-- 动态渲染 -->
+            </div>
+            <div id="shoppingList" class="mt-4 bg-white rounded-2xl p-4 shadow-sm">
+                <!-- 动态渲染 -->
+            </div>
+        </div>
+
     </div>
 
-</div>
-
-<!-- ===== 添加菜谱弹窗 ===== -->
-<div id="recipeModal" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 hidden z-50" onclick="if(event.target===this)closeModal()">
-    <div class="bg-white rounded-3xl p-6 max-w-sm w-full max-h-[80vh] overflow-y-auto">
-        <h3 class="text-lg font-bold mb-4">📝 添加菜谱</h3>
-        <input id="recipeName" placeholder="菜名" class="w-full border rounded-xl px-4 py-2 text-sm mb-3">
-        <input id="recipeIngredients" placeholder="食材，用逗号分隔，如：鸡蛋,西红柿,盐" class="w-full border rounded-xl px-4 py-2 text-sm mb-3">
-        <textarea id="recipeSteps" placeholder="步骤（可选）" rows="3" class="w-full border rounded-xl px-4 py-2 text-sm mb-4"></textarea>
-        <div class="flex gap-3">
-            <button onclick="saveRecipe()" class="flex-1 bg-orange-500 text-white py-2 rounded-xl font-medium">保存</button>
-            <button onclick="closeModal()" class="flex-1 bg-gray-200 py-2 rounded-xl font-medium">取消</button>
+    <!-- ===== 添加/编辑菜谱弹窗 ===== -->
+    <div id="recipeModal" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 hidden z-50" onclick="if(event.target===this)closeModal()">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full max-h-[80vh] overflow-y-auto">
+            <h3 class="text-lg font-bold mb-4" id="recipeModalTitle">📝 添加菜谱</h3>
+            <input id="recipeName" placeholder="菜名" class="w-full border rounded-xl px-4 py-2 text-sm mb-3">
+            <select id="recipeCategorySelect" class="w-full border rounded-xl px-4 py-2 text-sm mb-3 bg-white">
+                <!-- 由JS动态渲染 -->
+            </select>
+            <input id="recipeIngredients" placeholder="食材，用逗号分隔，如：鸡蛋,西红柿,盐" class="w-full border rounded-xl px-4 py-2 text-sm mb-3">
+            <textarea id="recipeSteps" placeholder="步骤（可选）" rows="3" class="w-full border rounded-xl px-4 py-2 text-sm mb-4"></textarea>
+            <input type="hidden" id="editRecipeId" value="">
+            <div class="flex gap-3">
+                <button onclick="saveRecipe()" class="flex-1 bg-orange-500 text-white py-2 rounded-xl font-medium">保存</button>
+                <button onclick="closeModal()" class="flex-1 bg-gray-200 py-2 rounded-xl font-medium">取消</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- ===== 手动选菜弹窗 ===== -->
-<div id="manualModal" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 hidden z-50" onclick="if(event.target===this)closeManual()">
-    <div class="bg-white rounded-3xl p-6 max-w-sm w-full max-h-[80vh] overflow-y-auto">
-        <h3 class="text-lg font-bold mb-4">✋ 选择想吃的菜</h3>
-        <div id="manualCheckboxList" class="space-y-2 mb-4"></div>
-        <button onclick="confirmManualSelect()" class="w-full bg-orange-500 text-white py-2 rounded-xl font-medium">确认生成菜单</button>
-        <button onclick="closeManual()" class="w-full mt-2 bg-gray-200 py-2 rounded-xl font-medium">取消</button>
-    </div>
-</div>
-
-<!-- ===== 分类管理弹窗 ===== -->
-<div id="categoryModal" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 hidden z-50" onclick="if(event.target===this)closeCategoryModal()">
-    <div class="bg-white rounded-3xl p-6 max-w-sm w-full">
-        <h3 class="text-lg font-bold mb-4">📂 管理分类</h3>
-        <div id="categoryList" class="space-y-2 mb-4"></div>
-        <div class="flex gap-2">
-            <input id="newCategoryInput" placeholder="新分类名称" class="flex-1 border rounded-xl px-4 py-2 text-sm">
-            <button onclick="addCategory()" class="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm">添加</button>
+    <!-- ===== 手动选菜弹窗 ===== -->
+    <div id="manualModal" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 hidden z-50" onclick="if(event.target===this)closeManual()">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full max-h-[80vh] overflow-y-auto">
+            <h3 class="text-lg font-bold mb-4">✋ 选择想吃的菜</h3>
+            <div id="manualCheckboxList" class="space-y-2 mb-4"></div>
+            <button onclick="confirmManualSelect()" class="w-full bg-orange-500 text-white py-2 rounded-xl font-medium">确认生成菜单</button>
+            <button onclick="closeManual()" class="w-full mt-2 bg-gray-200 py-2 rounded-xl font-medium">取消</button>
         </div>
-        <button onclick="closeCategoryModal()" class="w-full mt-3 bg-gray-200 py-2 rounded-xl font-medium">关闭</button>
     </div>
-</div>
 
-<!-- ===== 移动食材弹窗 ===== -->
-<div id="moveModal" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 hidden z-50" onclick="if(event.target===this)closeMoveModal()">
-    <div class="bg-white rounded-3xl p-6 max-w-sm w-full">
-        <h3 class="text-lg font-bold mb-4">📦 移动食材到...</h3>
-        <div id="moveTargetList" class="space-y-2 mb-4"></div>
-        <button onclick="closeMoveModal()" class="w-full bg-gray-200 py-2 rounded-xl font-medium">取消</button>
+    <!-- ===== 分类管理弹窗（通用：冰箱/菜谱） ===== -->
+    <div id="categoryModal" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 hidden z-50" onclick="if(event.target===this)closeCategoryModal()">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full">
+            <h3 class="text-lg font-bold mb-4" id="categoryModalTitle">📂 管理分类</h3>
+            <div id="categoryList" class="space-y-2 mb-4"></div>
+            <div class="flex gap-2">
+                <input id="newCategoryInput" placeholder="新分类名称" class="flex-1 border rounded-xl px-4 py-2 text-sm">
+                <button onclick="addCategory()" class="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm">添加</button>
+            </div>
+            <button onclick="closeCategoryModal()" class="w-full mt-3 bg-gray-200 py-2 rounded-xl font-medium">关闭</button>
+        </div>
     </div>
-</div>
 
-<script>
-// ============================================================
-// 数据层（升级版：支持分类）
-// ============================================================
-const STORAGE_KEY = 'cookAppData';
+    <!-- ===== 移动食材弹窗 ===== -->
+    <div id="moveModal" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 hidden z-50" onclick="if(event.target===this)closeMoveModal()">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full">
+            <h3 class="text-lg font-bold mb-4">📦 移动食材到...</h3>
+            <div id="moveTargetList" class="space-y-2 mb-4"></div>
+            <button onclick="closeMoveModal()" class="w-full bg-gray-200 py-2 rounded-xl font-medium">取消</button>
+        </div>
+    </div>
 
-const defaultData = {
-    // 冰箱数据改为分类对象
-    fridge: {
-        '果蔬': ['西红柿', '青椒', '洋葱', '土豆', '青菜', '黄瓜', '茄子', '四季豆'],
-        '肉蛋': ['鸡蛋', '鸡胸肉', '牛肉末', '鸡翅'],
-        '调料': ['盐', '生抽', '醋', '糖', '干辣椒', '豆瓣酱', '花椒粉', '香油', '大蒜', '生姜', '葱花'],
-        '其他': ['花生米', '豆腐', '可乐']
-    },
-    categories: ['果蔬', '肉蛋', '调料', '其他'],
-    recipes: [
-        { id: 'r1', name: '西红柿炒鸡蛋', ingredients: ['鸡蛋', '西红柿', '盐'], steps: '鸡蛋打散，西红柿切块，先炒鸡蛋盛出，再炒西红柿出汁，混合翻炒。' },
-        { id: 'r2', name: '青椒土豆丝', ingredients: ['青椒', '土豆', '盐', '醋'], steps: '土豆切丝泡水，青椒切丝，热油下土豆丝翻炒，加青椒，调味。' },
-        { id: 'r3', name: '洋葱炒鸡蛋', ingredients: ['洋葱', '鸡蛋', '盐'], steps: '洋葱切丝，鸡蛋打散，先炒鸡蛋盛出，再炒洋葱变软，混合。' },
-        { id: 'r4', name: '酸辣土豆丝', ingredients: ['土豆', '干辣椒', '醋', '盐'], steps: '土豆切丝泡水，热油爆香干辣椒，下土豆丝翻炒，加醋和盐。' },
-        { id: 'r5', name: '蒜蓉炒青菜', ingredients: ['青菜', '大蒜', '盐'], steps: '大蒜切末，热油爆香，下青菜大火快炒，加盐出锅。' },
-        { id: 'r6', name: '番茄蛋花汤', ingredients: ['西红柿', '鸡蛋', '葱花', '盐'], steps: '西红柿切块煮汤，淋入蛋液成蛋花，撒葱花和盐。' },
-        { id: 'r7', name: '干煸四季豆', ingredients: ['四季豆', '干辣椒', '大蒜', '盐'], steps: '四季豆煸炒至表皮皱，加干辣椒和大蒜，调味。' },
-        { id: 'r8', name: '宫保鸡丁', ingredients: ['鸡胸肉', '花生米', '干辣椒', '生抽', '醋'], steps: '鸡胸肉切丁腌制，炒至变色，加花生米和干辣椒，调味。' },
-        { id: 'r9', name: '鱼香茄子', ingredients: ['茄子', '豆瓣酱', '大蒜', '生抽', '糖'], steps: '茄子切条油炸，爆香豆瓣酱和大蒜，加茄子翻炒调味。' },
-        { id: 'r10', name: '麻婆豆腐', ingredients: ['豆腐', '豆瓣酱', '牛肉末', '花椒粉', '盐'], steps: '豆腐切块焯水，炒豆瓣酱和牛肉末，加豆腐煮，撒花椒粉。' },
-        { id: 'r11', name: '可乐鸡翅', ingredients: ['鸡翅', '可乐', '生抽', '姜片'], steps: '鸡翅煎两面金黄，加可乐、生抽和姜片，炖煮收汁。' },
-        { id: 'r12', name: '凉拌黄瓜', ingredients: ['黄瓜', '大蒜', '醋', '生抽', '香油'], steps: '黄瓜拍碎切段，加蒜末、醋、生抽和香油拌匀。' }
-    ],
-    today: { dishes: [], date: '' },
-    history: []
-};
+    <script>
+        // ============================================================
+        // 数据层
+        // ============================================================
+        const STORAGE_KEY = 'cookAppData';
 
-let appData = loadData();
+        const defaultData = {
+            fridge: {
+                '果蔬': ['西红柿', '青椒', '洋葱', '土豆', '青菜', '黄瓜', '茄子', '四季豆'],
+                '肉蛋': ['鸡蛋', '鸡胸肉', '牛肉末', '鸡翅'],
+                '调料': ['盐', '生抽', '醋', '糖', '干辣椒', '豆瓣酱', '花椒粉', '香油', '大蒜', '生姜', '葱花'],
+                '其他': ['花生米', '豆腐', '可乐']
+            },
+            fridgeCategories: ['果蔬', '肉蛋', '调料', '其他'],
+            // 菜谱分类
+            recipeCategories: ['家常菜', '川菜', '快手菜', '汤类', '主食'],
+            recipes: [
+                { id: 'r1', name: '西红柿炒鸡蛋', category: '家常菜', ingredients: ['鸡蛋', '西红柿', '盐'],
+                steps: '鸡蛋打散，西红柿切块，先炒鸡蛋盛出，再炒西红柿出汁，混合翻炒。' },
+                { id: 'r2', name: '青椒土豆丝', category: '家常菜', ingredients: ['青椒', '土豆', '盐', '醋'],
+                steps: '土豆切丝泡水，青椒切丝，热油下土豆丝翻炒，加青椒，调味。' },
+                { id: 'r3', name: '洋葱炒鸡蛋', category: '家常菜', ingredients: ['洋葱', '鸡蛋', '盐'],
+                steps: '洋葱切丝，鸡蛋打散，先炒鸡蛋盛出，再炒洋葱变软，混合。' },
+                { id: 'r4', name: '酸辣土豆丝', category: '家常菜', ingredients: ['土豆', '干辣椒', '醋', '盐'],
+                steps: '土豆切丝泡水，热油爆香干辣椒，下土豆丝翻炒，加醋和盐。' },
+                { id: 'r5', name: '蒜蓉炒青菜', category: '快手菜', ingredients: ['青菜', '大蒜', '盐'],
+                steps: '大蒜切末，热油爆香，下青菜大火快炒，加盐出锅。' },
+                { id: 'r6', name: '番茄蛋花汤', category: '汤类', ingredients: ['西红柿', '鸡蛋', '葱花', '盐'],
+                steps: '西红柿切块煮汤，淋入蛋液成蛋花，撒葱花和盐。' },
+                { id: 'r7', name: '干煸四季豆', category: '川菜', ingredients: ['四季豆', '干辣椒', '大蒜', '盐'],
+                steps: '四季豆煸炒至表皮皱，加干辣椒和大蒜，调味。' },
+                { id: 'r8', name: '宫保鸡丁', category: '川菜', ingredients: ['鸡胸肉', '花生米', '干辣椒', '生抽', '醋'],
+                    steps: '鸡胸肉切丁腌制，炒至变色，加花生米和干辣椒，调味。' },
+                { id: 'r9', name: '鱼香茄子', category: '川菜', ingredients: ['茄子', '豆瓣酱', '大蒜', '生抽', '糖'],
+                    steps: '茄子切条油炸，爆香豆瓣酱和大蒜，加茄子翻炒调味。' },
+                { id: 'r10', name: '麻婆豆腐', category: '川菜', ingredients: ['豆腐', '豆瓣酱', '牛肉末', '花椒粉', '盐'],
+                    steps: '豆腐切块焯水，炒豆瓣酱和牛肉末，加豆腐煮，撒花椒粉。' },
+                { id: 'r11', name: '可乐鸡翅', category: '家常菜', ingredients: ['鸡翅', '可乐', '生抽', '姜片'],
+                    steps: '鸡翅煎两面金黄，加可乐、生抽和姜片，炖煮收汁。' },
+                { id: 'r12', name: '凉拌黄瓜', category: '快手菜', ingredients: ['黄瓜', '大蒜', '醋', '生抽', '香油'],
+                    steps: '黄瓜拍碎切段，加蒜末、醋、生抽和香油拌匀。' }
+            ],
+            today: { dishes: [], date: '' },
+            history: []
+        };
 
-function loadData() {
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-            const parsed = JSON.parse(raw);
-            // 兼容旧版数据：如果 fridge 是数组，转为分类对象
-            if (Array.isArray(parsed.fridge)) {
-                const oldFridge = parsed.fridge;
-                parsed.fridge = { '其他': oldFridge };
-                if (!parsed.categories) parsed.categories = ['其他'];
-            }
-            // 确保 categories 存在
-            if (!parsed.categories || !parsed.categories.length) {
-                parsed.categories = ['果蔬', '肉蛋', '调料', '其他'];
-            }
-            // 确保每个分类都存在
-            const merged = { ...JSON.parse(JSON.stringify(defaultData)), ...parsed };
-            return merged;
+        let appData = loadData();
+        let currentCategoryContext = 'fridge'; // 'fridge' or 'recipe'
+
+        function loadData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    // 兼容旧版数据
+                    if (Array.isArray(parsed.fridge)) {
+                        const oldFridge = parsed.fridge;
+                        parsed.fridge = { '其他': oldFridge };
+                        if (!parsed.fridgeCategories) parsed.fridgeCategories = ['其他'];
+                    }
+                    if (!parsed.fridgeCategories || !parsed.fridgeCategories.length) {
+                        parsed.fridgeCategories = ['果蔬', '肉蛋', '调料', '其他'];
+                    }
+                    // 确保每个分类都存在
+                    const merged = { ...JSON.parse(JSON.stringify(defaultData)), ...parsed };
+                    return merged;
+                }
+            } catch (e) { console.warn('数据加载失败，使用默认数据'); }
+            return JSON.parse(JSON.stringify(defaultData));
         }
-    } catch (e) { console.warn('数据加载失败，使用默认数据'); }
-    return JSON.parse(JSON.stringify(defaultData));
-}
 
-function saveData() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-    renderAll();
-}
-
-function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
-
-// ============================================================
-// Tab切换
-// ============================================================
-let currentTab = 'fridge';
-
-function switchTab(tab) {
-    currentTab = tab;
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-    document.getElementById(`tab-${tab}`).classList.remove('hidden');
-    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('tab-active', 'bg-orange-50'));
-    const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
-    if (btn) btn.classList.add('tab-active', 'bg-orange-50');
-    renderAll();
-}
-
-// ============================================================
-// 冰箱管理（分类版）
-// ============================================================
-function getFridgeItems() {
-    // 返回所有食材的平铺数组，用于推荐等
-    const all = [];
-    for (const cat in appData.fridge) {
-        if (Array.isArray(appData.fridge[cat])) {
-            all.push(...appData.fridge[cat]);
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+            renderAll();
         }
-    }
-    return all;
-}
 
-function addFridgeItem() {
-    const input = document.getElementById('fridgeInput');
-    const name = input.value.trim();
-    if (!name) return alert('请输入食材名称');
-    
-    const category = document.getElementById('categorySelect').value;
-    if (!appData.fridge[category]) {
-        appData.fridge[category] = [];
-    }
-    // 检查是否已存在（在所有分类中）
-    const allItems = getFridgeItems();
-    if (allItems.includes(name)) return alert(`「${name}」已在冰箱中`);
-    
-    appData.fridge[category].push(name);
-    saveData();
-    input.value = '';
-}
+        function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
-function removeFridgeItem(name) {
-    if (!confirm(`从冰箱中移除「${name}」？`)) return;
-    for (const cat in appData.fridge) {
-        const idx = appData.fridge[cat].indexOf(name);
-        if (idx !== -1) {
-            appData.fridge[cat].splice(idx, 1);
-            // 如果分类空了，保留空数组（不删除分类）
+        // ============================================================
+        // Tab切换
+        // ============================================================
+        let currentTab = 'fridge';
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('tab-active', 'bg-orange-50'));
+            const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+            if (btn) btn.classList.add('tab-active', 'bg-orange-50');
+            renderAll();
+        }
+
+        // ============================================================
+        // 冰箱管理
+        // ============================================================
+        function getFridgeItems() {
+            const all = [];
+            for (const cat in appData.fridge) {
+                if (Array.isArray(appData.fridge[cat])) {
+                    all.push(...appData.fridge[cat]);
+                }
+            }
+            return all;
+        }
+
+        function addFridgeItem() {
+            const input = document.getElementById('fridgeInput');
+            const name = input.value.trim();
+            if (!name) return alert('请输入食材名称');
+            const category = document.getElementById('categorySelect').value;
+            if (!appData.fridge[category]) {
+                appData.fridge[category] = [];
+            }
+            const allItems = getFridgeItems();
+            if (allItems.includes(name)) return alert(`「${name}」已在冰箱中`);
+            appData.fridge[category].push(name);
             saveData();
-            return;
+            input.value = '';
         }
-    }
-}
 
-function moveFridgeItem(name, targetCategory) {
-    // 从原分类移除
-    let found = false;
-    for (const cat in appData.fridge) {
-        const idx = appData.fridge[cat].indexOf(name);
-        if (idx !== -1) {
-            appData.fridge[cat].splice(idx, 1);
-            found = true;
-            break;
-        }
-    }
-    if (!found) return;
-    if (!appData.fridge[targetCategory]) {
-        appData.fridge[targetCategory] = [];
-    }
-    appData.fridge[targetCategory].push(name);
-    saveData();
-}
-
-function openMoveModal(name) {
-    const modal = document.getElementById('moveModal');
-    const container = document.getElementById('moveTargetList');
-    container.innerHTML = appData.categories.map(cat => `
-        <button onclick="moveFridgeItem('${name}','${cat}'); closeMoveModal();" 
-                class="w-full text-left px-4 py-2 border rounded-xl hover:bg-orange-50 transition">
-            📁 ${cat}
-        </button>
-    `).join('');
-    modal.classList.remove('hidden');
-    modal.dataset.target = name;
-}
-
-function closeMoveModal() {
-    document.getElementById('moveModal').classList.add('hidden');
-}
-
-// ============================================================
-// 分类管理
-// ============================================================
-function openCategoryManager() {
-    const modal = document.getElementById('categoryModal');
-    modal.classList.remove('hidden');
-    renderCategoryList();
-}
-
-function closeCategoryModal() {
-    document.getElementById('categoryModal').classList.add('hidden');
-}
-
-function renderCategoryList() {
-    const container = document.getElementById('categoryList');
-    container.innerHTML = appData.categories.map(cat => `
-        <div class="flex items-center justify-between gap-2 p-2 border rounded-xl">
-            <span>📁 ${cat}</span>
-            <div class="flex gap-1">
-                <button onclick="renameCategory('${cat}')" class="text-xs text-blue-500 px-2 py-1">✏️</button>
-                <button onclick="deleteCategory('${cat}')" class="text-xs text-red-400 px-2 py-1" ${appData.categories.length <= 1 ? 'disabled' : ''}>🗑️</button>
-            </div>
-        </div>
-    `).join('');
-}
-
-function addCategory() {
-    const input = document.getElementById('newCategoryInput');
-    const name = input.value.trim();
-    if (!name) return alert('请输入分类名称');
-    if (appData.categories.includes(name)) return alert('分类已存在');
-    appData.categories.push(name);
-    appData.fridge[name] = [];
-    saveData();
-    input.value = '';
-    renderCategoryList();
-    renderFridge();
-}
-
-function renameCategory(oldName) {
-    const newName = prompt(`将「${oldName}」重命名为：`, oldName);
-    if (!newName || newName === oldName) return;
-    if (appData.categories.includes(newName)) return alert('该名称已存在');
-    const idx = appData.categories.indexOf(oldName);
-    if (idx === -1) return;
-    appData.categories[idx] = newName;
-    appData.fridge[newName] = appData.fridge[oldName] || [];
-    delete appData.fridge[oldName];
-    saveData();
-    renderCategoryList();
-    renderFridge();
-}
-
-function deleteCategory(cat) {
-    if (appData.categories.length <= 1) return alert('至少保留一个分类');
-    if (!confirm(`确定删除分类「${cat}」吗？其下的食材将移至「其他」`)) return;
-    const items = appData.fridge[cat] || [];
-    if (!appData.fridge['其他']) appData.fridge['其他'] = [];
-    appData.fridge['其他'].push(...items);
-    delete appData.fridge[cat];
-    appData.categories = appData.categories.filter(c => c !== cat);
-    saveData();
-    renderCategoryList();
-    renderFridge();
-}
-
-// ============================================================
-// 菜谱管理（不变）
-// ============================================================
-function showAddRecipe() {
-    document.getElementById('recipeModal').classList.remove('hidden');
-    document.getElementById('recipeName').value = '';
-    document.getElementById('recipeIngredients').value = '';
-    document.getElementById('recipeSteps').value = '';
-}
-
-function closeModal() {
-    document.getElementById('recipeModal').classList.add('hidden');
-}
-
-function saveRecipe() {
-    const name = document.getElementById('recipeName').value.trim();
-    const ingredientsStr = document.getElementById('recipeIngredients').value.trim();
-    const steps = document.getElementById('recipeSteps').value.trim();
-    if (!name) return alert('请输入菜名');
-    if (!ingredientsStr) return alert('请输入食材');
-    const ingredients = ingredientsStr.split(/[,，、\s]+/).filter(s => s.trim());
-    if (ingredients.length === 0) return alert('请至少输入一种食材');
-    appData.recipes.push({
-        id: generateId(),
-        name,
-        ingredients,
-        steps: steps || '暂无步骤'
-    });
-    saveData();
-    closeModal();
-}
-
-function deleteRecipe(id) {
-    if (!confirm('确定删除这道菜吗？')) return;
-    appData.recipes = appData.recipes.filter(r => r.id !== id);
-    saveData();
-}
-
-// ============================================================
-// 推荐功能（适配新冰箱结构）
-// ============================================================
-function getRecommendations() {
-    const fridgeItems = getFridgeItems();
-    const result = appData.recipes.map(recipe => {
-        const matched = recipe.ingredients.filter(ing => fridgeItems.includes(ing));
-        const matchRate = Math.round((matched.length / recipe.ingredients.length) * 100);
-        return { ...recipe, matched, matchRate, missing: recipe.ingredients.filter(ing => !fridgeItems.includes(ing)) };
-    });
-    return result.sort((a, b) => b.matchRate - a.matchRate);
-}
-
-// ============================================================
-// 今日菜单（不变，但适配新冰箱）
-// ============================================================
-function generateRandomMenu() {
-    const count = parseInt(document.getElementById('dishCount').value) || 2;
-    if (appData.recipes.length === 0) return alert('菜谱库为空，请先添加菜谱');
-    const shuffled = [...appData.recipes].sort(() => Math.random() - 0.5);
-    const selected = shuffled.slice(0, Math.min(count, shuffled.length));
-    setTodayMenu(selected);
-}
-
-function showManualSelect() {
-    if (appData.recipes.length === 0) return alert('菜谱库为空，请先添加菜谱');
-    const container = document.getElementById('manualCheckboxList');
-    container.innerHTML = appData.recipes.map(r => `
-        <label class="flex items-center gap-3 p-2 border rounded-xl hover:bg-gray-50">
-            <input type="checkbox" value="${r.id}" class="w-5 h-5 accent-orange-500">
-            <span>${r.name}</span>
-            <span class="text-xs text-gray-400 ml-auto">${r.ingredients.join('、')}</span>
-        </label>
-    `).join('');
-    document.getElementById('manualModal').classList.remove('hidden');
-}
-
-function closeManual() {
-    document.getElementById('manualModal').classList.add('hidden');
-}
-
-function confirmManualSelect() {
-    const checked = document.querySelectorAll('#manualCheckboxList input:checked');
-    if (checked.length === 0) return alert('请至少选择一道菜');
-    const ids = Array.from(checked).map(el => el.value);
-    const selected = appData.recipes.filter(r => ids.includes(r.id));
-    setTodayMenu(selected);
-    closeManual();
-}
-
-function setTodayMenu(dishes) {
-    const today = new Date().toISOString().slice(0, 10);
-    appData.today = {
-        date: today,
-        dishes: dishes.map(d => d.id)
-    };
-    appData.history = appData.history.filter(h => h.date !== today);
-    appData.history.push({ date: today, dishes: dishes.map(d => d.id) });
-    saveData();
-}
-
-function getShoppingList() {
-    const today = appData.today;
-    if (!today.dishes || today.dishes.length === 0) return { needBuy: [], alreadyHave: [] };
-    const selectedRecipes = appData.recipes.filter(r => today.dishes.includes(r.id));
-    const allIngredients = new Set();
-    selectedRecipes.forEach(r => r.ingredients.forEach(ing => allIngredients.add(ing)));
-    const fridgeItems = getFridgeItems();
-    const needBuy = [];
-    const alreadyHave = [];
-    allIngredients.forEach(ing => {
-        if (fridgeItems.includes(ing)) {
-            alreadyHave.push(ing);
-        } else {
-            needBuy.push(ing);
-        }
-    });
-    return { needBuy, alreadyHave, dishes: selectedRecipes };
-}
-
-function addToToday(recipeId) {
-    const today = appData.today;
-    if (today.dishes.includes(recipeId)) return alert('该菜已在今日菜单中');
-    today.dishes.push(recipeId);
-    saveData();
-}
-
-function clearTodayMenu() {
-    if (!confirm('确定清空今日菜单吗？')) return;
-    appData.today.dishes = [];
-    saveData();
-}
-
-// ============================================================
-// 数据导入/导出（适配新数据结构）
-// ============================================================
-function exportData() {
-    const json = JSON.stringify(appData, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `cook_data_${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-}
-
-function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const data = JSON.parse(e.target.result);
-            if (data.fridge && data.recipes) {
-                appData = { ...appData, ...data };
-                saveData();
-                alert('✅ 数据导入成功！');
-            } else {
-                alert('❌ 数据格式不正确');
+        function removeFridgeItem(name) {
+            if (!confirm(`从冰箱中移除「${name}」？`)) return;
+            for (const cat in appData.fridge) {
+                const idx = appData.fridge[cat].indexOf(name);
+                if (idx !== -1) {
+                    appData.fridge[cat].splice(idx, 1);
+                    saveData();
+                    return;
+                }
             }
-        } catch (err) {
-            alert('❌ 文件解析失败');
         }
-    };
-    reader.readAsText(file);
-    event.target.value = '';
-}
 
-// ============================================================
-// 渲染引擎（全部适配新分类）
-// ============================================================
-function renderAll() {
-    renderCategorySelect();
-    renderFridge();
-    renderRecipes();
-    renderRecommend();
-    renderTodayMenu();
-}
+        function moveFridgeItem(name, targetCategory) {
+            let found = false;
+            for (const cat in appData.fridge) {
+                const idx = appData.fridge[cat].indexOf(name);
+                if (idx !== -1) {
+                    appData.fridge[cat].splice(idx, 1);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) return;
+            if (!appData.fridge[targetCategory]) {
+                appData.fridge[targetCategory] = [];
+            }
+            appData.fridge[targetCategory].push(name);
+            saveData();
+        }
 
-function renderCategorySelect() {
-    const select = document.getElementById('categorySelect');
-    const currentVal = select.value;
-    select.innerHTML = appData.categories.map(c => `<option value="${c}">${c}</option>`).join('');
-    if (currentVal && appData.categories.includes(currentVal)) select.value = currentVal;
-}
+        function openMoveModal(name) {
+            const modal = document.getElementById('moveModal');
+            const container = document.getElementById('moveTargetList');
+            container.innerHTML = appData.fridgeCategories.map(cat => `
+                        <button onclick="moveFridgeItem('${name}','${cat}'); closeMoveModal();" 
+                                class="w-full text-left px-4 py-2 border rounded-xl hover:bg-orange-50 transition">
+                            📁 ${cat}
+                        </button>
+                    `).join('');
+            modal.classList.remove('hidden');
+            modal.dataset.target = name;
+        }
 
-function renderFridge() {
-    const container = document.getElementById('fridgeList');
-    const cats = appData.categories.filter(c => appData.fridge[c] && appData.fridge[c].length > 0);
-    if (cats.length === 0 && getFridgeItems().length === 0) {
-        container.innerHTML = '<p class="text-gray-400 text-sm w-full text-center py-4">冰箱是空的，快去采购吧 🛒</p>';
-        return;
-    }
-    let html = '';
-    // 显示有食材的分类
-    cats.forEach(cat => {
-        const items = appData.fridge[cat] || [];
-        if (items.length === 0) return;
-        html += `<div class="category-header"><span>📂 ${cat}</span><span class="text-xs text-gray-400">${items.length}项</span></div>`;
-        html += `<div class="flex flex-wrap pb-1">`;
-        items.forEach(name => {
-            html += `<span class="fridge-item" onclick="openMoveModal('${name}')">${name} <span class="del" onclick="event.stopPropagation(); removeFridgeItem('${name}')">✕</span></span>`;
-        });
-        html += `</div>`;
-    });
-    // 如果有分类存在但为空，显示空状态
-    if (!html) {
-        container.innerHTML = '<p class="text-gray-400 text-sm w-full text-center py-4">冰箱空空如也 🧊</p>';
-        return;
-    }
-    container.innerHTML = html;
-}
+        function closeMoveModal() {
+            document.getElementById('moveModal').classList.add('hidden');
+        }
 
-function renderRecipes() {
-    const container = document.getElementById('recipeList');
-    if (appData.recipes.length === 0) {
-        container.innerHTML = '<p class="text-gray-400 text-sm text-center py-8">暂无菜谱，点击上方添加 📝</p>';
-        return;
-    }
-    container.innerHTML = appData.recipes.map(r => `
-        <div class="dish-card bg-white rounded-2xl p-4 shadow-sm border-l-4 border-orange-400">
-            <div class="flex justify-between items-start">
-                <h4 class="font-medium text-base">${r.name}</h4>
-                <button onclick="deleteRecipe('${r.id}')" class="text-gray-300 hover:text-red-400 text-sm">🗑️</button>
-            </div>
-            <div class="flex flex-wrap mt-1">
-                ${r.ingredients.map(ing => `<span class="ingredient-tag">${ing}</span>`).join('')}
-            </div>
-            <p class="text-xs text-gray-400 mt-2 line-clamp-2">${r.steps}</p>
-        </div>
-    `).join('');
-}
+        // ============================================================
+        // 通用分类管理（冰箱/菜谱）
+        // ============================================================
+        function openCategoryManager(context) {
+            currentCategoryContext = context;
+            const modal = document.getElementById('categoryModal');
+            const title = document.getElementById('categoryModalTitle');
+            title.textContent = context === 'fridge' ? '📂 管理冰箱分类' : '📂 管理菜谱分类';
+            modal.classList.remove('hidden');
+            renderCategoryList();
+        }
 
-function renderRecommend() {
-    const container = document.getElementById('recommendList');
-    const recommendations = getRecommendations();
-    const fridgeItems = getFridgeItems();
-    if (recommendations.length === 0) {
-        container.innerHTML = '<p class="text-gray-400 text-sm text-center py-8">暂无菜谱可推荐</p>';
-        return;
-    }
-    container.innerHTML = recommendations.map((r, idx) => `
-        <div class="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
-            <div class="flex-1">
-                <div class="flex items-center gap-2">
-                    <span class="text-sm font-medium">${idx+1}.</span>
-                    <span class="font-medium">${r.name}</span>
-                    <span class="badge ${r.matchRate >= 80 ? 'bg-green-100 text-green-700' : r.matchRate >= 50 ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-500'}">${r.matchRate}% 匹配</span>
-                </div>
-                <div class="flex flex-wrap mt-1">
-                    ${r.ingredients.map(ing => `<span class="ingredient-tag ${fridgeItems.includes(ing) ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-500'}">${ing} ${fridgeItems.includes(ing) ? '✅' : '❌'}</span>`).join('')}
-                </div>
-                ${r.missing.length > 0 ? `<p class="text-xs text-red-400 mt-1">缺少：${r.missing.join('、')}</p>` : '<p class="text-xs text-green-500 mt-1">🎉 所有食材都有！可以做了！</p>'}
-            </div>
-            <button onclick="addToToday('${r.id}')" class="ml-2 text-orange-500 text-sm font-medium whitespace-nowrap">➕ 加入菜单</button>
-        </div>
-    `).join('');
-}
+        function closeCategoryModal() {
+            document.getElementById('categoryModal').classList.add('hidden');
+        }
 
-function renderTodayMenu() {
-    const container = document.getElementById('todayMenu');
-    const today = appData.today;
-    if (!today.dishes || today.dishes.length === 0) {
-        container.innerHTML = `
-            <div class="text-center py-8 text-gray-400">
-                <p class="text-4xl mb-2">🍽️</p>
-                <p>今天还没有菜单</p>
-                <p class="text-sm">点击上方「随机生成」或「手动选菜」</p>
-            </div>
-        `;
-        document.getElementById('shoppingList').innerHTML = '';
-        return;
-    }
-    const selectedRecipes = appData.recipes.filter(r => today.dishes.includes(r.id));
-    if (selectedRecipes.length === 0) {
-        container.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">菜单数据异常，请重新生成</p>';
-        return;
-    }
-    container.innerHTML = `
-        <div class="flex items-center justify-between mb-3">
-            <h3 class="font-bold text-lg">📋 今日菜单</h3>
-            <span class="text-xs text-gray-400">${today.date}</span>
-        </div>
-        ${selectedRecipes.map(r => `
-            <div class="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">
-                <span class="text-orange-400 text-xl">🍲</span>
-                <span class="font-medium">${r.name}</span>
-                <span class="text-xs text-gray-400 ml-auto">${r.ingredients.join('、')}</span>
-            </div>
-        `).join('')}
-        <button onclick="clearTodayMenu()" class="mt-3 text-sm text-red-400">清空今日菜单</button>
-    `;
+        function getCategories() {
+            return currentCategoryContext === 'fridge' ? appData.fridgeCategories : appData.recipeCategories;
+        }
 
-    const { needBuy, alreadyHave } = getShoppingList();
-    const listContainer = document.getElementById('shoppingList');
-    if (needBuy.length === 0 && alreadyHave.length === 0) {
-        listContainer.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">暂无菜单，无法生成购物清单</p>';
-        return;
-    }
-    listContainer.innerHTML = `
-        <h4 class="font-bold text-base mb-3">🛒 购物清单</h4>
-        ${needBuy.length > 0 ? `
-            <div class="mb-3">
-                <p class="text-sm text-red-500 font-medium">需要购买：</p>
-                <div class="flex flex-wrap gap-2 mt-1">
-                    ${needBuy.map(ing => `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm">${ing}</span>`).join('')}
-                </div>
-            </div>
-        ` : '<p class="text-green-500 text-sm mb-2">🎉 所有食材冰箱里都有！</p>'}
-        ${alreadyHave.length > 0 ? `
-            <div>
-                <p class="text-sm text-green-500 font-medium">冰箱已有：</p>
-                <div class="flex flex-wrap gap-2 mt-1">
-                    ${alreadyHave.map(ing => `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">${ing} ✅</span>`).join('')}
-                </div>
-            </div>
-        ` : ''}
-    `;
-}
+        function setCategories(newCats) {
+            if (currentCategoryContext === 'fridge') {
+                appData.fridgeCategories = newCats;
+            } else {
+                appData.recipeCategories = newCats;
+            }
+            saveData();
+        }
 
-// ============================================================
-// 初始化
-// ============================================================
-switchTab('fridge');
-</script>
+        function getCategoryData() {
+            return currentCategoryContext === 'fridge' ? appData.fridge : appData.recipes;
+        }
+
+        function renderCategoryList() {
+            const container = document.getElementById('categoryList');
+            const cats = getCategories();
+            container.innerHTML = cats.map(cat => `
+                        <div class="flex items-center justify-between gap-2 p-2 border rounded-xl">
+                            <span>📁 ${cat}</span>
+                            <div class="flex gap-1">
+                                <button onclick="renameCategory('${cat}')" class="text-xs text-blue-500 px-2 py-1">✏️</button>
+                                <button onclick="deleteCategory('${cat}')" class="text-xs text-red-400 px-2 py-1" ${cats.length <= 1 ? 'disabled' : ''}>🗑️</button>
+                            </div>
+                        </div>
+                    `).join('');
+        }
+
+        function addCategory() {
+            const input = document.getElementById('newCategoryInput');
+            const name = input.value.trim();
+            if (!name) return alert('请输入分类名称');
+            const cats = getCategories();
+            if (cats.includes(name)) return alert('分类已存在');
+            cats.push(name);
+            setCategories(cats);
+            if (currentCategoryContext === 'fridge') {
+                appData.fridge[name] = [];
+            }
+            saveData();
+            input.value = '';
+            renderCategoryList();
+            renderAll();
+        }
+
+        function renameCategory(oldName) {
+            const newName = prompt(`将「${oldName}」重命名为：`, oldName);
+            if (!newName || newName === oldName) return;
+            const cats = getCategories();
+            if (cats.includes(newName)) return alert('该名称已存在');
+            const idx = cats.indexOf(oldName);
+            if (idx === -1) return;
+            cats[idx] = newName;
+            setCategories(cats);
+            if (currentCategoryContext === 'fridge') {
+                appData.fridge[newName] = appData.fridge[oldName] || [];
+                delete appData.fridge[oldName];
+            } else {
+                // 更新菜谱中的分类
+                appData.recipes.forEach(r => {
+                    if (r.category === oldName) r.category = newName;
+                });
+            }
+            saveData();
+            renderCategoryList();
+            renderAll();
+        }
+
+        function deleteCategory(cat) {
+            const cats = getCategories();
+            if (cats.length <= 1) return alert('至少保留一个分类');
+            if (!confirm(`确定删除分类「${cat}」吗？`)) return;
+            if (currentCategoryContext === 'fridge') {
+                const items = appData.fridge[cat] || [];
+                if (!appData.fridge['其他']) appData.fridge['其他'] = [];
+                appData.fridge['其他'].push(...items);
+                delete appData.fridge[cat];
+            } else {
+                // 菜谱分类：将属于该分类的菜谱移到「其他」
+                appData.recipes.forEach(r => {
+                    if (r.category === cat) r.category = '其他';
+                });
+            }
+            const newCats = cats.filter(c => c !== cat);
+            setCategories(newCats);
+            saveData();
+            renderCategoryList();
+            renderAll();
+        }
+
+        // ============================================================
+        // 菜谱管理（带分类）
+        // ============================================================
+        function showAddRecipe(recipeId) {
+            const modal = document.getElementById('recipeModal');
+            const title = document.getElementById('recipeModalTitle');
+            const nameInput = document.getElementById('recipeName');
+            const catSelect = document.getElementById('recipeCategorySelect');
+            const ingInput = document.getElementById('recipeIngredients');
+            const stepsInput = document.getElementById('recipeSteps');
+            const editIdInput = document.getElementById('editRecipeId');
+
+            // 渲染分类下拉
+            catSelect.innerHTML = appData.recipeCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+
+            if (recipeId) {
+                // 编辑模式
+                const recipe = appData.recipes.find(r => r.id === recipeId);
+                if (!recipe) return;
+                title.textContent = '✏️ 编辑菜谱';
+                nameInput.value = recipe.name;
+                catSelect.value = recipe.category || appData.recipeCategories[0];
+                ingInput.value = recipe.ingredients.join('、');
+                stepsInput.value = recipe.steps || '';
+                editIdInput.value = recipeId;
+            } else {
+                title.textContent = '📝 添加菜谱';
+                nameInput.value = '';
+                catSelect.value = appData.recipeCategories[0];
+                ingInput.value = '';
+                stepsInput.value = '';
+                editIdInput.value = '';
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('recipeModal').classList.add('hidden');
+        }
+
+        function saveRecipe() {
+            const name = document.getElementById('recipeName').value.trim();
+            const category = document.getElementById('recipeCategorySelect').value;
+            const ingredientsStr = document.getElementById('recipeIngredients').value.trim();
+            const steps = document.getElementById('recipeSteps').value.trim();
+            const editId = document.getElementById('editRecipeId').value;
+
+            if (!name) return alert('请输入菜名');
+            if (!ingredientsStr) return alert('请输入食材');
+            const ingredients = ingredientsStr.split(/[,，、\s]+/).filter(s => s.trim());
+            if (ingredients.length === 0) return alert('请至少输入一种食材');
+
+            if (editId) {
+                // 编辑
+                const recipe = appData.recipes.find(r => r.id === editId);
+                if (recipe) {
+                    recipe.name = name;
+                    recipe.category = category;
+                    recipe.ingredients = ingredients;
+                    recipe.steps = steps || '暂无步骤';
+                }
+            } else {
+                // 新增
+                appData.recipes.push({
+                    id: generateId(),
+                    name,
+                    category: category,
+                    ingredients,
+                    steps: steps || '暂无步骤'
+                });
+            }
+            saveData();
+            closeModal();
+        }
+
+        function deleteRecipe(id) {
+            if (!confirm('确定删除这道菜吗？')) return;
+            appData.recipes = appData.recipes.filter(r => r.id !== id);
+            saveData();
+        }
+
+        function editRecipe(id) {
+            showAddRecipe(id);
+        }
+
+        // ============================================================
+        // 推荐功能
+        // ============================================================
+        function getRecommendations() {
+            const fridgeItems = getFridgeItems();
+            const result = appData.recipes.map(recipe => {
+                const matched = recipe.ingredients.filter(ing => fridgeItems.includes(ing));
+                const matchRate = Math.round((matched.length / recipe.ingredients.length) * 100);
+                return { ...recipe, matched, matchRate, missing: recipe.ingredients.filter(ing => !fridgeItems
+                        .includes(ing)) };
+            });
+            return result.sort((a, b) => b.matchRate - a.matchRate);
+        }
+
+        function addToToday(recipeId, btnElement) {
+            const today = appData.today;
+            if (today.dishes.includes(recipeId)) {
+                alert('该菜已在今日菜单中');
+                return;
+            }
+            today.dishes.push(recipeId);
+            saveData();
+            // 按钮反馈
+            if (btnElement) {
+                btnElement.textContent = '已加入 ✅';
+                btnElement.classList.add('btn-added');
+                btnElement.onclick = null;
+            }
+            renderTodayMenu();
+            renderShoppingList();
+        }
+
+        // ============================================================
+        // 今日菜单（优化版）
+        // ============================================================
+        function generateRandomMenu() {
+            const count = parseInt(document.getElementById('dishCount').value) || 3;
+            if (appData.recipes.length === 0) return alert('菜谱库为空，请先添加菜谱');
+            const shuffled = [...appData.recipes].sort(() => Math.random() - 0.5);
+            const selected = shuffled.slice(0, Math.min(count, shuffled.length));
+            setTodayMenu(selected);
+        }
+
+        function showManualSelect() {
+            if (appData.recipes.length === 0) return alert('菜谱库为空，请先添加菜谱');
+            const container = document.getElementById('manualCheckboxList');
+            container.innerHTML = appData.recipes.map(r => `
+                        <label class="flex items-center gap-3 p-2 border rounded-xl hover:bg-gray-50">
+                            <input type="checkbox" value="${r.id}" class="w-5 h-5 accent-orange-500" ${appData.today.dishes.includes(r.id) ? 'checked disabled' : ''}>
+                            <span>${r.name}</span>
+                            <span class="text-xs text-gray-400 ml-auto">${r.ingredients.join('、')}</span>
+                        </label>
+                    `).join('');
+            document.getElementById('manualModal').classList.remove('hidden');
+        }
+
+        function closeManual() {
+            document.getElementById('manualModal').classList.add('hidden');
+        }
+
+        function confirmManualSelect() {
+            const checked = document.querySelectorAll('#manualCheckboxList input:checked');
+            if (checked.length === 0) return alert('请至少选择一道菜');
+            const ids = Array.from(checked).map(el => el.value);
+            const selected = appData.recipes.filter(r => ids.includes(r.id));
+            setTodayMenu(selected);
+            closeManual();
+        }
+
+        function setTodayMenu(dishes) {
+            const today = new Date().toISOString().slice(0, 10);
+            appData.today = {
+                date: today,
+                dishes: dishes.map(d => d.id)
+            };
+            appData.history = appData.history.filter(h => h.date !== today);
+            appData.history.push({ date: today, dishes: dishes.map(d => d.id) });
+            saveData();
+        }
+
+        // 逐个删除今日菜单中的菜
+        function removeFromToday(recipeId) {
+            appData.today.dishes = appData.today.dishes.filter(id => id !== recipeId);
+            saveData();
+            renderTodayMenu();
+            renderShoppingList();
+            // 同时刷新推荐页的按钮状态（如果有推荐页打开）
+            renderRecommend();
+        }
+
+        function clearTodayMenu() {
+            if (!confirm('确定清空今日菜单吗？')) return;
+            appData.today.dishes = [];
+            saveData();
+        }
+
+        function getShoppingList() {
+            const today = appData.today;
+            if (!today.dishes || today.dishes.length === 0) return { needBuy: [], alreadyHave: [], dishes: [] };
+            const selectedRecipes = appData.recipes.filter(r => today.dishes.includes(r.id));
+            const allIngredients = new Set();
+            selectedRecipes.forEach(r => r.ingredients.forEach(ing => allIngredients.add(ing)));
+            const fridgeItems = getFridgeItems();
+            const needBuy = [];
+            const alreadyHave = [];
+            allIngredients.forEach(ing => {
+                if (fridgeItems.includes(ing)) {
+                    alreadyHave.push(ing);
+                } else {
+                    needBuy.push(ing);
+                }
+            });
+            return { needBuy, alreadyHave, dishes: selectedRecipes };
+        }
+
+        // ============================================================
+        // 数据导入/导出
+        // ============================================================
+        function exportData() {
+            const json = JSON.stringify(appData, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `cook_data_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.fridge && data.recipes) {
+                        appData = { ...appData, ...data };
+                        saveData();
+                        alert('✅ 数据导入成功！');
+                    } else {
+                        alert('❌ 数据格式不正确');
+                    }
+                } catch (err) {
+                    alert('❌ 文件解析失败');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // ============================================================
+        // 渲染引擎
+        // ============================================================
+        function renderAll() {
+            renderCategorySelect();
+            renderFridge();
+            renderRecipeCategoryFilter();
+            renderRecipes();
+            renderRecommend();
+            renderTodayMenu();
+            renderShoppingList();
+            renderRecipeCategorySelect();
+        }
+
+        function renderCategorySelect() {
+            const select = document.getElementById('categorySelect');
+            const currentVal = select.value;
+            select.innerHTML = appData.fridgeCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+            if (currentVal && appData.fridgeCategories.includes(currentVal)) select.value = currentVal;
+        }
+
+        function renderRecipeCategorySelect() {
+            const select = document.getElementById('recipeCategorySelect');
+            if (!select) return;
+            const currentVal = select.value;
+            select.innerHTML = appData.recipeCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+            if (currentVal && appData.recipeCategories.includes(currentVal)) select.value = currentVal;
+        }
+
+        function renderFridge() {
+            const container = document.getElementById('fridgeList');
+            const cats = appData.fridgeCategories.filter(c => appData.fridge[c] && appData.fridge[c].length > 0);
+            if (cats.length === 0 && getFridgeItems().length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-sm w-full text-center py-4">冰箱是空的，快去采购吧 🛒</p>';
+                return;
+            }
+            let html = '';
+            cats.forEach(cat => {
+                const items = appData.fridge[cat] || [];
+                if (items.length === 0) return;
+                html += `<div class="category-header"><span>📂 ${cat}</span><span class="text-xs text-gray-400">${items.length}项</span></div>`;
+                html += `<div class="flex flex-wrap pb-1">`;
+                items.forEach(name => {
+                    html +=
+                        `<span class="fridge-item" onclick="openMoveModal('${name}')">${name} <span class="del" onclick="event.stopPropagation(); removeFridgeItem('${name}')">✕</span></span>`;
+                });
+                html += `</div>`;
+            });
+            if (!html) {
+                container.innerHTML = '<p class="text-gray-400 text-sm w-full text-center py-4">冰箱空空如也 🧊</p>';
+                return;
+            }
+            container.innerHTML = html;
+        }
+
+        function renderRecipeCategoryFilter() {
+            const container = document.getElementById('recipeCategoryFilter');
+            const cats = ['全部', ...appData.recipeCategories];
+            container.innerHTML = cats.map(cat =>
+                `<button onclick="filterRecipeByCategory('${cat}')" class="px-3 py-1 rounded-full text-sm whitespace-nowrap ${currentRecipeFilter === cat ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700'}" data-cat="${cat}">${cat}</button>`
+            ).join('');
+        }
+
+        let currentRecipeFilter = '全部';
+
+        function filterRecipeByCategory(cat) {
+            currentRecipeFilter = cat;
+            renderRecipeCategoryFilter();
+            renderRecipes();
+        }
+
+        function renderRecipes() {
+            const container = document.getElementById('recipeList');
+            let filtered = appData.recipes;
+            if (currentRecipeFilter !== '全部') {
+                filtered = filtered.filter(r => r.category === currentRecipeFilter);
+            }
+            if (filtered.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-sm text-center py-8">暂无菜谱，点击上方添加 📝</p>';
+                return;
+            }
+            container.innerHTML = filtered.map(r => `
+                        <div class="dish-card bg-white rounded-2xl p-4 shadow-sm border-l-4 border-orange-400">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-medium text-base">${r.name}</h4>
+                                    <span class="recipe-cat-tag">${r.category || '未分类'}</span>
+                                </div>
+                                <div class="flex gap-1">
+                                    <button onclick="editRecipe('${r.id}')" class="text-gray-400 hover:text-blue-500 text-sm">✏️</button>
+                                    <button onclick="deleteRecipe('${r.id}')" class="text-gray-300 hover:text-red-400 text-sm">🗑️</button>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap mt-1">
+                                ${r.ingredients.map(ing => `<span class="ingredient-tag">${ing}</span>`).join('')}
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2 line-clamp-2">${r.steps}</p>
+                        </div>
+                    `).join('');
+        }
+
+        function renderRecommend() {
+            const container = document.getElementById('recommendList');
+            const recommendations = getRecommendations();
+            const fridgeItems = getFridgeItems();
+            const todayIds = appData.today.dishes || [];
+            if (recommendations.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-sm text-center py-8">暂无菜谱可推荐</p>';
+                return;
+            }
+            container.innerHTML = recommendations.map((r, idx) => {
+                const isInMenu = todayIds.includes(r.id);
+                return `
+                            <div class="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="text-sm font-medium">${idx+1}.</span>
+                                        <span class="font-medium">${r.name}</span>
+                                        <span class="recipe-cat-tag">${r.category || '未分类'}</span>
+                                        <span class="badge ${r.matchRate >= 80 ? 'bg-green-100 text-green-700' : r.matchRate >= 50 ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-500'}">${r.matchRate}% 匹配</span>
+                                    </div>
+                                    <div class="flex flex-wrap mt-1">
+                                        ${r.ingredients.map(ing => `<span class="ingredient-tag ${fridgeItems.includes(ing) ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-500'}">${ing} ${fridgeItems.includes(ing) ? '✅' : '❌'}</span>`).join('')}
+                                    </div>
+                                    ${r.missing.length > 0 ? `<p class="text-xs text-red-400 mt-1">缺少：${r.missing.join('、')}</p>` : '<p class="text-xs text-green-500 mt-1">🎉 所有食材都有！可以做了！</p>'}
+                                </div>
+                                <button onclick="addToToday('${r.id}', this)" class="ml-2 text-sm font-medium whitespace-nowrap px-3 py-1 rounded-full ${isInMenu ? 'bg-gray-300 text-gray-500 cursor-default' : 'bg-orange-100 text-orange-600 hover:bg-orange-200'}" ${isInMenu ? 'disabled' : ''}>
+                                    ${isInMenu ? '已加入 ✅' : '➕ 加入菜单'}
+                                </button>
+                            </div>
+                        `;
+            }).join('');
+        }
+
+        function renderTodayMenu() {
+            const container = document.getElementById('todayMenu');
+            const today = appData.today;
+            if (!today.dishes || today.dishes.length === 0) {
+                container.innerHTML = `
+                            <div class="text-center py-8 text-gray-400">
+                                <p class="text-4xl mb-2">🍽️</p>
+                                <p>今天还没有菜单</p>
+                                <p class="text-sm">点击上方「随机生成」或「手动选菜」</p>
+                            </div>
+                        `;
+                return;
+            }
+            const selectedRecipes = appData.recipes.filter(r => today.dishes.includes(r.id));
+            if (selectedRecipes.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">菜单数据异常，请重新生成</p>';
+                return;
+            }
+            container.innerHTML = `
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-lg">📋 今日菜单</h3>
+                            <span class="text-xs text-gray-400">${today.date}</span>
+                        </div>
+                        ${selectedRecipes.map(r => `
+                            <div class="flex items-center justify-between gap-3 py-2 border-b border-gray-100 last:border-0">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-orange-400 text-xl">🍲</span>
+                                    <span class="font-medium">${r.name}</span>
+                                    <span class="text-xs text-gray-400">${r.ingredients.join('、')}</span>
+                                </div>
+                                <span class="menu-item-remove" onclick="removeFromToday('${r.id}')" title="从今日菜单中移除">✕</span>
+                            </div>
+                        `).join('')}
+                        <button onclick="clearTodayMenu()" class="mt-3 text-sm text-red-400">清空全部</button>
+                    `;
+        }
+
+        function renderShoppingList() {
+            const container = document.getElementById('shoppingList');
+            const today = appData.today;
+            if (!today.dishes || today.dishes.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">暂无菜单，无法生成购物清单</p>';
+                return;
+            }
+            const { needBuy, alreadyHave } = getShoppingList();
+            container.innerHTML = `
+                        <h4 class="font-bold text-base mb-3">🛒 购物清单</h4>
+                        ${needBuy.length > 0 ? `
+                            <div class="mb-3">
+                                <p class="text-sm text-red-500 font-medium">需要购买：</p>
+                                <div class="flex flex-wrap gap-2 mt-1">
+                                    ${needBuy.map(ing => `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm">${ing}</span>`).join('')}
+                                </div>
+                            </div>
+                        ` : '<p class="text-green-500 text-sm mb-2">🎉 所有食材冰箱里都有！</p>'}
+                        ${alreadyHave.length > 0 ? `
+                            <div>
+                                <p class="text-sm text-green-500 font-medium">冰箱已有：</p>
+                                <div class="flex flex-wrap gap-2 mt-1">
+                                    ${alreadyHave.map(ing => `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">${ing} ✅</span>`).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    `;
+        }
+
+        // ============================================================
+        // 初始化
+        // ============================================================
+        switchTab('fridge');
+    </script>
 
 </body>
 </html>
