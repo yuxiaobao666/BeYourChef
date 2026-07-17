@@ -182,6 +182,89 @@
             background: #e5e7eb;
         }
 
+        /* ===== 折叠式菜谱卡片样式 ===== */
+        .recipe-card-wrapper {
+            margin-bottom: 12px;
+        }
+
+        .recipe-card {
+            background: white;
+            border-radius: 16px;
+            padding: 14px 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border-left: 4px solid #f97316;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .recipe-card:active {
+            transform: scale(0.98);
+            background: #fafafa;
+        }
+
+        .recipe-card .recipe-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .recipe-card .recipe-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            flex: 1;
+        }
+
+        .recipe-card .expand-icon {
+            font-size: 16px;
+            color: #9ca3af;
+            transition: transform 0.25s ease;
+            margin-left: auto;
+        }
+
+        .recipe-card .recipe-details {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #f3f4f6;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .recipe-card .steps-text {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 10px 0 14px 0;
+            line-height: 1.6;
+        }
+
+        .recipe-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .action-btn {
+            padding: 6px 18px;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .action-btn.edit-btn:hover {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        .action-btn.delete-btn:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
         /* 页面底部留白 */
         #app {
             padding-bottom: 80px !important;
@@ -775,7 +858,7 @@
         }
 
         // ============================================================
-        // 一键复制今日菜单（新功能）
+        // 一键复制今日菜单
         // ============================================================
         function copyTodayMenu() {
             const today = appData.today;
@@ -866,6 +949,19 @@
         }
 
         // ============================================================
+        // 折叠式菜谱 - 展开/收起状态管理
+        // ============================================================
+        // 存储每个菜谱的展开状态
+        if (typeof window._expandedRecipes === 'undefined') {
+            window._expandedRecipes = {};
+        }
+
+        function toggleRecipe(id) {
+            window._expandedRecipes[id] = !window._expandedRecipes[id];
+            renderRecipes();
+        }
+
+        // ============================================================
         // 渲染引擎
         // ============================================================
         function renderAll() {
@@ -936,6 +1032,7 @@
             renderRecipes();
         }
 
+        // ===== 折叠式菜谱渲染 =====
         function renderRecipes() {
             const container = document.getElementById('recipeList');
             let filtered = appData.recipes;
@@ -946,24 +1043,31 @@
                 container.innerHTML = '<p class="text-gray-400 text-sm text-center py-8">暂无菜谱，点击上方添加 📝</p>';
                 return;
             }
-            container.innerHTML = filtered.map(r => `
-                        <div class="dish-card bg-white rounded-2xl p-4 shadow-sm border-l-4 border-orange-400">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h4 class="font-medium text-base">${r.name}</h4>
-                                    <span class="recipe-cat-tag">${r.category || '未分类'}</span>
-                                </div>
-                                <div class="flex gap-1">
-                                    <button onclick="editRecipe('${r.id}')" class="text-gray-400 hover:text-blue-500 text-sm">✏️</button>
-                                    <button onclick="deleteRecipe('${r.id}')" class="text-gray-300 hover:text-red-400 text-sm">🗑️</button>
+
+            container.innerHTML = filtered.map(r => {
+                const isExpanded = window._expandedRecipes[r.id] || false;
+                return `
+                            <div class="recipe-card-wrapper" data-id="${r.id}">
+                                <div class="recipe-card" onclick="toggleRecipe('${r.id}')">
+                                    <div class="recipe-header">
+                                        <span class="recipe-name">${r.name}</span>
+                                        <span class="recipe-cat-tag">${r.category || '未分类'}</span>
+                                        <span class="expand-icon">${isExpanded ? '▾' : '▸'}</span>
+                                    </div>
+                                    <div class="recipe-details" style="display: ${isExpanded ? 'block' : 'none'};">
+                                        <div class="ingredients">
+                                            ${r.ingredients.map(ing => `<span class="ingredient-tag">${ing}</span>`).join('')}
+                                        </div>
+                                        <p class="steps-text">${r.steps || '暂无步骤'}</p>
+                                        <div class="recipe-actions">
+                                            <button onclick="event.stopPropagation(); editRecipe('${r.id}')" class="action-btn edit-btn">✏️ 编辑</button>
+                                            <button onclick="event.stopPropagation(); deleteRecipe('${r.id}')" class="action-btn delete-btn">🗑️ 删除</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex flex-wrap mt-1">
-                                ${r.ingredients.map(ing => `<span class="ingredient-tag">${ing}</span>`).join('')}
-                            </div>
-                            <p class="text-xs text-gray-400 mt-2 line-clamp-2">${r.steps}</p>
-                        </div>
-                    `).join('');
+                        `;
+            }).join('');
         }
 
         function renderRecommend() {
@@ -1011,7 +1115,6 @@
                             </div>
                         `;
                 document.getElementById('shoppingList').innerHTML = '';
-                // 隐藏复制按钮
                 const copyBtn = document.getElementById('copyMenuBtn');
                 if (copyBtn) copyBtn.style.display = 'none';
                 return;
