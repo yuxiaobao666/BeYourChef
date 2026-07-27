@@ -83,6 +83,7 @@
             margin: 4px 6px 4px 0;
             cursor: pointer;
             transition: 0.1s;
+            font-size: 14px;
         }
         .fridge-item:active {
             background: #fee2e2;
@@ -92,6 +93,12 @@
             color: #f87171;
             font-weight: bold;
         }
+        .fridge-item .days-badge {
+            font-size: 10px;
+            color: #9ca3af;
+            margin-left: 4px;
+            font-weight: 400;
+        }
         .recipe-cat-tag {
             background: #e0e7ff;
             color: #4338ca;
@@ -100,12 +107,13 @@
             font-size: 11px;
             display: inline-block;
         }
+        /* 优化：调小×图标 */
         .menu-item-remove {
             color: #f87171;
             font-weight: bold;
             cursor: pointer;
-            padding: 0 6px;
-            font-size: 18px;
+            padding: 0 4px;
+            font-size: 14px;
             line-height: 1;
         }
         .menu-item-remove:hover {
@@ -182,39 +190,42 @@
         }
 
         /* ===== 两栏网格菜谱卡片 ===== */
-        #recipeList {
-            display: grid !important;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-        }
+#recipeList {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+}
 
-        .recipe-grid-card {
-            background: white;
-            border-radius: 12px;
-            padding: 12px 14px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border-left: 3px solid #f97316;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            display: flex;
-            align-items: center;
-            min-height: 40px;
-            height: 40px;
-            position: relative;
-        }
+.recipe-grid-card {
+    background: white;
+    border-radius: 6px;
+    padding: 4px 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    border-left: 2px solid #f97316; /* 更细的边框 */
+    cursor: pointer;
+    transition: all 0.1s ease;
+    display: flex;
+    align-items: center;
+    min-height: 28px;
+    height: 32px;
+}
 
-        .recipe-grid-card:active {
-            transform: scale(0.96);
-            background: #fafafa;
-        }
+.recipe-grid-card:active {
+    transform: scale(0.97);
+    background: #fafafa;
+}
 
-        .recipe-grid-card .recipe-name {
-            font-size: 15px;
-            font-weight: 500;
-            color: #1f2937;
-            line-height: 1.3;
-            word-break: break-word;
-        }
+.recipe-grid-card .recipe-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: #1f2937;
+    line-height: 1.2;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 
         /* ===== 详情弹窗样式 ===== */
         .detail-modal-mask {
@@ -277,11 +288,40 @@
             margin: -12px auto 20px auto;
         }
 
+        /* 优化：详情弹窗标题行增加"加入菜单"按钮 */
+        .detail-modal-sheet .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
         .detail-modal-sheet .detail-name {
             font-size: 24px;
             font-weight: 700;
             color: #1f2937;
-            margin-bottom: 6px;
+        }
+
+        .detail-modal-sheet .detail-add-btn {
+            background: #f97316;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 4px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .detail-modal-sheet .detail-add-btn:active {
+            background: #ea580c;
+        }
+
+        .detail-modal-sheet .detail-add-btn.added {
+            background: #9ca3af;
+            cursor: default;
         }
 
         .detail-modal-sheet .detail-category {
@@ -404,7 +444,7 @@
                 <button onclick="openCategoryManager('recipe')" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium">📂 管理分类</button>
             </div>
             <div id="recipeCategoryFilter" class="flex gap-2 overflow-x-auto no-scrollbar pb-2 mb-0"></div>
-            <div id="recipeList" class="space-y-3-mt-6"></div>
+            <div id="recipeList"></div>
         </div>
 
         <div id="tab-recommend" class="tab-content hidden">
@@ -422,7 +462,7 @@
                 </div>
                 <div class="flex gap-2 mt-2">
                     <button onclick="generateRandomMenu()" class="flex-1 bg-orange-500 text-white px-5 py-2 rounded-xl text-sm font-medium">🎲 随机生成</button>
-                    <button onclick="showManualSelect()" class="flex-1 bg-blue-500 text-white px-5 py-2 rounded-xl text-sm font-medium">✋ 手动选菜</button>
+                    <!-- 优化：去掉手动选菜按钮 -->
                 </div>
             </div>
             <div id="todayMenu" class="bg-white rounded-2xl p-4 shadow-sm"></div>
@@ -454,7 +494,11 @@
     <div id="detailModal" class="detail-modal-mask" onclick="closeDetailModal(event)">
         <div class="detail-modal-sheet" onclick="event.stopPropagation()">
             <div class="sheet-handle"></div>
-            <div class="detail-name" id="detailName">菜名</div>
+            <!-- 优化：标题行增加"加入菜单"按钮 -->
+            <div class="detail-header">
+                <div class="detail-name" id="detailName">菜名</div>
+                <button class="detail-add-btn" id="detailAddBtn" onclick="addFromDetail()">➕ 加入菜单</button>
+            </div>
             <div class="detail-category" id="detailCategory">分类</div>
             <div class="detail-ingredients" id="detailIngredients"></div>
             <div class="detail-steps" id="detailSteps">步骤</div>
@@ -482,6 +526,7 @@
         </div>
     </div>
 
+    <!-- 优化：手动选菜弹窗已不再使用，但保留代码以防旧数据依赖 -->
     <div id="manualModal" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 hidden z-50" onclick="if(event.target===this)closeManual()">
         <div class="bg-white rounded-3xl p-6 max-w-sm w-full max-h-[80vh] overflow-y-auto">
             <h3 class="text-lg font-bold mb-4">✋ 选择想吃的菜</h3>
@@ -603,7 +648,7 @@
         }
 
         // ============================================================
-        // 冰箱管理
+        // 冰箱管理（优化：记录食材添加时间）
         // ============================================================
         function getFridgeItems() {
             const all = [];
@@ -625,7 +670,11 @@
             }
             const allItems = getFridgeItems();
             if (allItems.includes(name)) return alert(`「${name}」已在冰箱中`);
-            appData.fridge[category].push(name);
+            // 优化：存入时附带时间戳
+            appData.fridge[category].push({
+                name: name,
+                addedAt: Date.now()
+            });
             saveData();
             input.value = '';
         }
@@ -633,7 +682,8 @@
         function removeFridgeItem(name) {
             if (!confirm(`从冰箱中移除「${name}」？`)) return;
             for (const cat in appData.fridge) {
-                const idx = appData.fridge[cat].indexOf(name);
+                const idx = appData.fridge[cat].findIndex(item => typeof item === 'object' ? item.name === name : item ===
+                    name);
                 if (idx !== -1) {
                     appData.fridge[cat].splice(idx, 1);
                     saveData();
@@ -644,9 +694,11 @@
 
         function moveFridgeItem(name, targetCategory) {
             let found = false;
+            let item = null;
             for (const cat in appData.fridge) {
-                const idx = appData.fridge[cat].indexOf(name);
+                const idx = appData.fridge[cat].findIndex(i => typeof i === 'object' ? i.name === name : i === name);
                 if (idx !== -1) {
+                    item = appData.fridge[cat][idx];
                     appData.fridge[cat].splice(idx, 1);
                     found = true;
                     break;
@@ -656,7 +708,7 @@
             if (!appData.fridge[targetCategory]) {
                 appData.fridge[targetCategory] = [];
             }
-            appData.fridge[targetCategory].push(name);
+            appData.fridge[targetCategory].push(item);
             saveData();
         }
 
@@ -870,7 +922,7 @@
         }
 
         // ============================================================
-        // 菜谱详情弹窗
+        // 菜谱详情弹窗（优化：增加"加入菜单"按钮）
         // ============================================================
         function openDetailModal(id) {
             const recipe = appData.recipes.find(r => r.id === id);
@@ -885,6 +937,13 @@
             document.getElementById('detailSteps').textContent = recipe.steps || '暂无步骤';
             document.getElementById('detailEditBtn').dataset.id = id;
             document.getElementById('detailDeleteBtn').dataset.id = id;
+
+            // 更新"加入菜单"按钮状态
+            const addBtn = document.getElementById('detailAddBtn');
+            const isInMenu = appData.today.dishes && appData.today.dishes.includes(id);
+            addBtn.textContent = isInMenu ? '已加入 ✅' : '➕ 加入菜单';
+            addBtn.className = 'detail-add-btn' + (isInMenu ? ' added' : '');
+            addBtn.dataset.id = id;
 
             document.getElementById('detailModal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -907,8 +966,32 @@
             if (id) deleteRecipe(id);
         }
 
+        // 优化：从详情弹窗加入菜单
+        function addFromDetail() {
+            const btn = document.getElementById('detailAddBtn');
+            const id = btn.dataset.id;
+            if (!id) return;
+            if (btn.classList.contains('added')) {
+                alert('该菜已在今日菜单中');
+                return;
+            }
+            const today = appData.today;
+            if (today.dishes.includes(id)) {
+                btn.textContent = '已加入 ✅';
+                btn.classList.add('added');
+                return;
+            }
+            today.dishes.push(id);
+            saveData();
+            btn.textContent = '已加入 ✅';
+            btn.classList.add('added');
+            renderTodayMenu();
+            renderShoppingList();
+            renderRecommend();
+        }
+
         // ============================================================
-        // 推荐功能
+        // 推荐功能（优化：只展示前10个）
         // ============================================================
         function getRecommendations() {
             const fridgeItems = getFridgeItems();
@@ -936,10 +1019,16 @@
             }
             renderTodayMenu();
             renderShoppingList();
+            // 更新详情弹窗按钮状态
+            const detailBtn = document.getElementById('detailAddBtn');
+            if (detailBtn && detailBtn.dataset.id === recipeId) {
+                detailBtn.textContent = '已加入 ✅';
+                detailBtn.classList.add('added');
+            }
         }
 
         // ============================================================
-        // 今日菜单
+        // 今日菜单（优化：去除日期显示）
         // ============================================================
         function generateRandomMenu() {
             const count = parseInt(document.getElementById('dishCount').value) || 3;
@@ -949,17 +1038,9 @@
             setTodayMenu(selected);
         }
 
+        // 注意：手动选菜功能已移除，但保留旧函数以防外部调用
         function showManualSelect() {
-            if (appData.recipes.length === 0) return alert('菜谱库为空，请先添加菜谱');
-            const container = document.getElementById('manualCheckboxList');
-            container.innerHTML = appData.recipes.map(r => `
-                        <label class="flex items-center gap-3 p-2 border rounded-xl hover:bg-gray-50">
-                            <input type="checkbox" value="${r.id}" class="w-5 h-5 accent-orange-500" ${appData.today.dishes.includes(r.id) ? 'checked disabled' : ''}>
-                            <span>${r.name}</span>
-                            <span class="text-xs text-gray-400 ml-auto">${r.ingredients.join('、')}</span>
-                        </label>
-                    `).join('');
-            document.getElementById('manualModal').classList.remove('hidden');
+            alert('手动选菜功能已移至菜谱详情页，请在菜谱页点击菜名后选择"加入菜单"');
         }
 
         function closeManual() {
@@ -967,12 +1048,7 @@
         }
 
         function confirmManualSelect() {
-            const checked = document.querySelectorAll('#manualCheckboxList input:checked');
-            if (checked.length === 0) return alert('请至少选择一道菜');
-            const ids = Array.from(checked).map(el => el.value);
-            const selected = appData.recipes.filter(r => ids.includes(r.id));
-            setTodayMenu(selected);
-            closeManual();
+            // 保留空实现
         }
 
         function setTodayMenu(dishes) {
@@ -992,6 +1068,12 @@
             renderTodayMenu();
             renderShoppingList();
             renderRecommend();
+            // 更新详情弹窗按钮状态
+            const detailBtn = document.getElementById('detailAddBtn');
+            if (detailBtn && detailBtn.dataset.id === recipeId) {
+                detailBtn.textContent = '➕ 加入菜单';
+                detailBtn.classList.remove('added');
+            }
         }
 
         function clearTodayMenu() {
@@ -1020,7 +1102,7 @@
         }
 
         // ============================================================
-        // 一键复制今日菜单
+        // 一键复制今日菜单（优化：缩短分隔线）
         // ============================================================
         function copyTodayMenu() {
             const today = appData.today;
@@ -1033,7 +1115,7 @@
 
             const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
             let text = `🍳 BeYourChef 今日菜单 (${dateStr})\n`;
-            text += '─'.repeat(20) + '\n';
+            text += '─'.repeat(12) + '\n'; // 优化：分隔线从20改为12
             selectedRecipes.forEach((r, idx) => {
                 text += `${idx+1}. ${r.name}\n`;
                 text += `  食材: ${r.ingredients.join('、')}\n`;
@@ -1152,9 +1234,22 @@
                 if (items.length === 0) return;
                 html += `<div class="category-header"><span>📂 ${cat}</span><span class="text-xs text-gray-400">${items.length}项</span></div>`;
                 html += `<div class="flex flex-wrap pb-1">`;
-                items.forEach(name => {
+                items.forEach(item => {
+                    const name = typeof item === 'object' ? item.name : item;
+                    const addedAt = typeof item === 'object' ? item.addedAt : null;
+                    let daysText = '';
+                    if (addedAt) {
+                        const days = Math.floor((Date.now() - addedAt) / (1000 * 60 * 60 * 24));
+                        if (days === 0) {
+                            daysText = ' <span class="days-badge">今日新增</span>';
+                        } else {
+                            daysText = ` <span class="days-badge">已存放${days}天</span>`;
+                        }
+                    } else {
+                        daysText = ' <span class="days-badge">未知</span>';
+                    }
                     html +=
-                        `<span class="fridge-item" onclick="openMoveModal('${name}')">${name} <span class="del" onclick="event.stopPropagation(); removeFridgeItem('${name}')">✕</span></span>`;
+                        `<span class="fridge-item" onclick="openMoveModal('${name}')">${name}${daysText} <span class="del" onclick="event.stopPropagation(); removeFridgeItem('${name}')">✕</span></span>`;
                 });
                 html += `</div>`;
             });
@@ -1203,13 +1298,15 @@
         function renderRecommend() {
             const container = document.getElementById('recommendList');
             const recommendations = getRecommendations();
+            // 优化：只展示前10个
+            const top10 = recommendations.slice(0, 10);
             const fridgeItems = getFridgeItems();
             const todayIds = appData.today.dishes || [];
-            if (recommendations.length === 0) {
+            if (top10.length === 0) {
                 container.innerHTML = '<p class="text-gray-400 text-sm text-center py-8">暂无菜谱可推荐</p>';
                 return;
             }
-            container.innerHTML = recommendations.map((r, idx) => {
+            container.innerHTML = top10.map((r, idx) => {
                 const isInMenu = todayIds.includes(r.id);
                 return `
                             <div class="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
@@ -1233,6 +1330,7 @@
             }).join('');
         }
 
+        // 优化：今日菜单不显示日期
         function renderTodayMenu() {
             const container = document.getElementById('todayMenu');
             const today = appData.today;
@@ -1241,7 +1339,7 @@
                             <div class="text-center py-8 text-gray-400">
                                 <p class="text-4xl mb-2">🍽️</p>
                                 <p>今天还没有菜单</p>
-                                <p class="text-sm">点击下方「随机生成」或「手动选菜」</p>
+                                <p class="text-sm">点击「随机生成」或从菜谱详情页加入</p>
                             </div>
                         `;
                 document.getElementById('shoppingList').innerHTML = '';
@@ -1257,7 +1355,6 @@
             let html = `
                         <div class="flex items-center justify-between mb-3">
                             <h3 class="font-bold text-lg">📋 今日菜单</h3>
-                            <span class="text-xs text-gray-400">${today.date}</span>
                         </div>
                         ${selectedRecipes.map(r => `
                             <div class="flex items-center justify-between gap-3 py-2 border-b border-gray-100 last:border-0">
