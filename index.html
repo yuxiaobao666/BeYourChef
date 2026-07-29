@@ -650,14 +650,21 @@
         // ============================================================
         // 冰箱管理（优化：记录食材添加时间）
         // ============================================================
-        function getFridgeItems() {
-            const all = [];
-            for (const cat in appData.fridge) {
-                if (Array.isArray(appData.fridge[cat])) {
-                    all.push(...appData.fridge[cat]);
+function getFridgeItems() {
+    const all = [];
+    for (const cat in appData.fridge) {
+        if (Array.isArray(appData.fridge[cat])) {
+            appData.fridge[cat].forEach(item => {
+                // 如果 item 是对象，取它的 name 字段；否则直接用 item 本身
+                if (typeof item === 'object' && item !== null && item.name) {
+                    all.push(item.name);
+                } else {
+                    all.push(item);
                 }
-            }
-            return all;
+            });
+        }
+    }
+    return all;
         }
 
         function addFridgeItem() {
