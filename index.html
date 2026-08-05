@@ -107,7 +107,6 @@
             font-size: 11px;
             display: inline-block;
         }
-        /* 优化：调小×图标 */
         .menu-item-remove {
             color: #f87171;
             font-weight: bold;
@@ -123,6 +122,68 @@
             background-color: #9ca3af !important;
             cursor: default !important;
             opacity: 0.7;
+        }
+        .week-day-card {
+            background: white;
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border-left: 3px solid #f97316;
+        }
+        .week-day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .week-day-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: #1f2937;
+        }
+        .week-day-name span {
+            font-weight: 400;
+            font-size: 12px;
+            color: #9ca3af;
+            margin-left: 6px;
+        }
+        .week-day-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .week-day-actions button {
+            background: #f3f4f6;
+            border: none;
+            border-radius: 20px;
+            padding: 2px 12px;
+            font-size: 12px;
+            color: #4b5563;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .week-day-actions button:active {
+            background: #e5e7eb;
+        }
+        .week-dish-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 14px;
+            color: #374151;
+            border-bottom: 1px dashed #f3f4f6;
+        }
+        .week-dish-item:last-child {
+            border-bottom: none;
+        }
+        .week-dish-item .del {
+            color: #f87171;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 0 4px;
+            font-size: 14px;
         }
 
         /* ===== 底部导航样式 ===== */
@@ -145,22 +206,22 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 4px 16px;
+            padding: 4px 8px;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
             -webkit-tap-highlight-color: transparent;
-            min-width: 56px;
+            min-width: 48px;
             background: transparent;
             border: none;
             font-family: inherit;
         }
         .nav-item .nav-icon {
-            font-size: 24px;
+            font-size: 22px;
             line-height: 1.4;
         }
         .nav-item .nav-label {
-            font-size: 11px;
+            font-size: 10px;
             color: #9ca3af;
             transition: color 0.2s;
         }
@@ -190,42 +251,42 @@
         }
 
         /* ===== 两栏网格菜谱卡片 ===== */
-#recipeList {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr;
-    gap: 3px;
-}
+        #recipeList {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            gap: 3px;
+        }
 
-.recipe-grid-card {
-    background: white;
-    border-radius: 6px;
-    padding: 4px 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-    border-left: 2px solid #f97316; /* 更细的边框 */
-    cursor: pointer;
-    transition: all 0.1s ease;
-    display: flex;
-    align-items: center;
-    min-height: 28px;
-    height: 32px;
-}
+        .recipe-grid-card {
+            background: white;
+            border-radius: 6px;
+            padding: 4px 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            border-left: 2px solid #f97316;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            min-height: 28px;
+            height: 32px;
+        }
 
-.recipe-grid-card:active {
-    transform: scale(0.97);
-    background: #fafafa;
-}
+        .recipe-grid-card:active {
+            transform: scale(0.97);
+            background: #fafafa;
+        }
 
-.recipe-grid-card .recipe-name {
-    font-size: 12px;
-    font-weight: 500;
-    color: #1f2937;
-    line-height: 1.2;
-    word-break: break-word;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
+        .recipe-grid-card .recipe-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: #1f2937;
+            line-height: 1.2;
+            word-break: break-word;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
 
         /* ===== 详情弹窗样式 ===== */
         .detail-modal-mask {
@@ -242,11 +303,9 @@
             justify-content: center;
             animation: maskFadeIn 0.25s ease;
         }
-
         .detail-modal-mask.active {
             display: flex;
         }
-
         @keyframes maskFadeIn {
             from {
                 opacity: 0;
@@ -268,7 +327,6 @@
             overflow-y: auto;
             position: relative;
         }
-
         @keyframes sheetUp {
             from {
                 transform: translateY(40px);
@@ -287,21 +345,17 @@
             border-radius: 4px;
             margin: -12px auto 20px auto;
         }
-
-        /* 优化：详情弹窗标题行增加"加入菜单"按钮 */
         .detail-modal-sheet .detail-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 4px;
         }
-
         .detail-modal-sheet .detail-name {
             font-size: 24px;
             font-weight: 700;
             color: #1f2937;
         }
-
         .detail-modal-sheet .detail-add-btn {
             background: #f97316;
             color: white;
@@ -314,16 +368,13 @@
             transition: background 0.2s;
             white-space: nowrap;
         }
-
         .detail-modal-sheet .detail-add-btn:active {
             background: #ea580c;
         }
-
         .detail-modal-sheet .detail-add-btn.added {
             background: #9ca3af;
             cursor: default;
         }
-
         .detail-modal-sheet .detail-category {
             font-size: 13px;
             color: #4338ca;
@@ -333,14 +384,12 @@
             display: inline-block;
             margin-bottom: 16px;
         }
-
         .detail-modal-sheet .detail-ingredients {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
             margin-bottom: 16px;
         }
-
         .detail-modal-sheet .detail-steps {
             font-size: 14px;
             color: #4b5563;
@@ -352,13 +401,11 @@
             white-space: pre-wrap;
             word-break: break-word;
         }
-
         .detail-modal-sheet .detail-actions {
             display: flex;
             gap: 12px;
             justify-content: flex-end;
         }
-
         .detail-modal-sheet .detail-actions .action-btn {
             padding: 8px 24px;
             border: none;
@@ -368,25 +415,20 @@
             transition: background 0.2s;
             font-weight: 500;
         }
-
         .detail-modal-sheet .detail-actions .action-btn.edit-btn {
             background: #e0e7ff;
             color: #4338ca;
         }
-
         .detail-modal-sheet .detail-actions .action-btn.edit-btn:hover {
             background: #c7d2fe;
         }
-
         .detail-modal-sheet .detail-actions .action-btn.delete-btn {
             background: #fee2e2;
             color: #dc2626;
         }
-
         .detail-modal-sheet .detail-actions .action-btn.delete-btn:hover {
             background: #fecaca;
         }
-
         .detail-modal-sheet .detail-close {
             margin-top: 20px;
             width: 100%;
@@ -399,9 +441,52 @@
             cursor: pointer;
             font-weight: 500;
         }
-
         .detail-modal-sheet .detail-close:active {
             background: #e5e7eb;
+        }
+
+        /* ===== 添加菜到周计划弹窗 ===== */
+        .week-add-modal .modal-content {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        .week-add-modal .recipe-option {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .week-add-modal .recipe-option:active {
+            background: #fafafa;
+        }
+        .week-add-modal .custom-input-area {
+            padding: 14px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 10px;
+        }
+        .week-add-modal .custom-input-area input {
+            flex: 1;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            outline: none;
+        }
+        .week-add-modal .custom-input-area input:focus {
+            border-color: #f97316;
+        }
+        .week-add-modal .custom-input-area button {
+            background: #f97316;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-size: 14px;
+            cursor: pointer;
         }
 
         /* 页面底部留白 */
@@ -424,8 +509,8 @@
         </div>
 
         <!-- ===== Tab内容容器 ===== -->
+        <!-- 冰箱 -->
         <div id="tab-fridge" class="tab-content">
-            <!-- 冰箱内容 -->
             <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
                 <div class="flex gap-2 flex-wrap">
                     <input id="fridgeInput" placeholder="食材名称" class="flex-1 min-w-[120px] border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
@@ -438,6 +523,7 @@
             <p class="text-xs text-gray-400 mt-3 text-center">点击食材可移动分类 · 点击 ✕ 删除</p>
         </div>
 
+        <!-- 菜谱 -->
         <div id="tab-recipes" class="tab-content hidden">
             <div class="flex gap-2 mb-3 flex-wrap">
                 <button onclick="showAddRecipe()" class="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm font-medium flex-1">➕ 添加菜谱</button>
@@ -447,6 +533,7 @@
             <div id="recipeList"></div>
         </div>
 
+        <!-- 推荐 -->
         <div id="tab-recommend" class="tab-content hidden">
             <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
                 <p class="text-sm text-gray-500">基于冰箱现有食材，推荐匹配度最高的菜品</p>
@@ -454,6 +541,7 @@
             <div id="recommendList" class="space-y-3"></div>
         </div>
 
+        <!-- 今日菜单 -->
         <div id="tab-menu" class="tab-content hidden">
             <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
                 <div class="flex items-center gap-3 flex-wrap">
@@ -462,11 +550,22 @@
                 </div>
                 <div class="flex gap-2 mt-2">
                     <button onclick="generateRandomMenu()" class="flex-1 bg-orange-500 text-white px-5 py-2 rounded-xl text-sm font-medium">🎲 随机生成</button>
-                    <!-- 优化：去掉手动选菜按钮 -->
                 </div>
             </div>
             <div id="todayMenu" class="bg-white rounded-2xl p-4 shadow-sm"></div>
             <div id="shoppingList" class="mt-4 bg-white rounded-2xl p-4 shadow-sm"></div>
+        </div>
+
+        <!-- ===== 新增：本周食谱 ===== -->
+        <div id="tab-week" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-lg font-bold text-gray-700">📅 本周食谱</h2>
+                <button onclick="clearWeekPlan()" class="text-xs text-red-400">清空本周</button>
+            </div>
+            <div id="weekPlanList">
+                <!-- 由 JS 动态渲染 -->
+            </div>
+            <p class="text-xs text-gray-400 mt-2 text-center">点击「+」添加菜 · 点击菜名旁的 ✕ 删除</p>
         </div>
 
         <!-- ===== 底部导航 ===== -->
@@ -485,7 +584,11 @@
             </button>
             <button class="nav-item" data-tab="menu" onclick="switchTab('menu')">
                 <span class="nav-icon">📋</span>
-                <span class="nav-label">今日菜单</span>
+                <span class="nav-label">今日</span>
+            </button>
+            <button class="nav-item" data-tab="week" onclick="switchTab('week')">
+                <span class="nav-icon">📅</span>
+                <span class="nav-label">本周</span>
             </button>
         </nav>
     </div>
@@ -494,7 +597,6 @@
     <div id="detailModal" class="detail-modal-mask" onclick="closeDetailModal(event)">
         <div class="detail-modal-sheet" onclick="event.stopPropagation()">
             <div class="sheet-handle"></div>
-            <!-- 优化：标题行增加"加入菜单"按钮 -->
             <div class="detail-header">
                 <div class="detail-name" id="detailName">菜名</div>
                 <button class="detail-add-btn" id="detailAddBtn" onclick="addFromDetail()">➕ 加入菜单</button>
@@ -526,7 +628,25 @@
         </div>
     </div>
 
-    <!-- 优化：手动选菜弹窗已不再使用，但保留代码以防旧数据依赖 -->
+<!-- 新增：添加菜到周计划弹窗 -->
+<div id="weekAddModal" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 hidden z-50 week-add-modal" onclick="if(event.target===this)closeWeekAddModal()">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full">
+        <h3 class="text-lg font-bold mb-3" id="weekAddModalTitle">📥 添加到周三</h3>
+        <!-- 新增搜索框 -->
+        <div class="mb-3">
+            <input id="weekSearchInput" placeholder="🔍 搜索菜谱..." class="w-full border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300" oninput="filterWeekRecipeList()" />
+        </div>
+        <div class="modal-content" id="weekAddRecipeList">
+            <!-- 动态渲染 -->
+        </div>
+        <div class="custom-input-area">
+            <input id="weekCustomDishInput" placeholder="输入新菜名（临时记录）" />
+            <button onclick="addCustomDishToWeek()">添加</button>
+        </div>
+        <button onclick="closeWeekAddModal()" class="w-full mt-3 bg-gray-200 py-2 rounded-xl font-medium">关闭</button>
+    </div>
+</div>
+
     <div id="manualModal" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 hidden z-50" onclick="if(event.target===this)closeManual()">
         <div class="bg-white rounded-3xl p-6 max-w-sm w-full max-h-[80vh] overflow-y-auto">
             <h3 class="text-lg font-bold mb-4">✋ 选择想吃的菜</h3>
@@ -598,12 +718,14 @@
                     steps: '黄瓜拍碎切段，加蒜末、醋、生抽和香油拌匀。' }
             ],
             today: { dishes: [], date: '' },
-            history: []
+            history: [],
+            weekPlan: {}
         };
 
         let appData = loadData();
         let currentCategoryContext = 'fridge';
         let currentDetailId = null;
+        let weekAddTargetDate = ''; // 当前正在添加菜的日期
 
         function loadData() {
             try {
@@ -618,6 +740,7 @@
                     if (!parsed.fridgeCategories || !parsed.fridgeCategories.length) {
                         parsed.fridgeCategories = ['果蔬', '肉蛋', '调料', '其他'];
                     }
+                    if (!parsed.weekPlan) parsed.weekPlan = {};
                     const merged = { ...JSON.parse(JSON.stringify(defaultData)), ...parsed };
                     return merged;
                 }
@@ -648,23 +771,22 @@
         }
 
         // ============================================================
-        // 冰箱管理（优化：记录食材添加时间）
+        // 冰箱管理
         // ============================================================
-function getFridgeItems() {
-    const all = [];
-    for (const cat in appData.fridge) {
-        if (Array.isArray(appData.fridge[cat])) {
-            appData.fridge[cat].forEach(item => {
-                // 如果 item 是对象，取它的 name 字段；否则直接用 item 本身
-                if (typeof item === 'object' && item !== null && item.name) {
-                    all.push(item.name);
-                } else {
-                    all.push(item);
+        function getFridgeItems() {
+            const all = [];
+            for (const cat in appData.fridge) {
+                if (Array.isArray(appData.fridge[cat])) {
+                    appData.fridge[cat].forEach(item => {
+                        if (typeof item === 'object' && item !== null && item.name) {
+                            all.push(item.name);
+                        } else {
+                            all.push(item);
+                        }
+                    });
                 }
-            });
-        }
-    }
-    return all;
+            }
+            return all;
         }
 
         function addFridgeItem() {
@@ -677,7 +799,6 @@ function getFridgeItems() {
             }
             const allItems = getFridgeItems();
             if (allItems.includes(name)) return alert(`「${name}」已在冰箱中`);
-            // 优化：存入时附带时间戳
             appData.fridge[category].push({
                 name: name,
                 addedAt: Date.now()
@@ -929,7 +1050,7 @@ function getFridgeItems() {
         }
 
         // ============================================================
-        // 菜谱详情弹窗（优化：增加"加入菜单"按钮）
+        // 菜谱详情弹窗
         // ============================================================
         function openDetailModal(id) {
             const recipe = appData.recipes.find(r => r.id === id);
@@ -945,7 +1066,6 @@ function getFridgeItems() {
             document.getElementById('detailEditBtn').dataset.id = id;
             document.getElementById('detailDeleteBtn').dataset.id = id;
 
-            // 更新"加入菜单"按钮状态
             const addBtn = document.getElementById('detailAddBtn');
             const isInMenu = appData.today.dishes && appData.today.dishes.includes(id);
             addBtn.textContent = isInMenu ? '已加入 ✅' : '➕ 加入菜单';
@@ -973,7 +1093,6 @@ function getFridgeItems() {
             if (id) deleteRecipe(id);
         }
 
-        // 优化：从详情弹窗加入菜单
         function addFromDetail() {
             const btn = document.getElementById('detailAddBtn');
             const id = btn.dataset.id;
@@ -998,7 +1117,7 @@ function getFridgeItems() {
         }
 
         // ============================================================
-        // 推荐功能（优化：只展示前10个）
+        // 推荐功能
         // ============================================================
         function getRecommendations() {
             const fridgeItems = getFridgeItems();
@@ -1026,7 +1145,6 @@ function getFridgeItems() {
             }
             renderTodayMenu();
             renderShoppingList();
-            // 更新详情弹窗按钮状态
             const detailBtn = document.getElementById('detailAddBtn');
             if (detailBtn && detailBtn.dataset.id === recipeId) {
                 detailBtn.textContent = '已加入 ✅';
@@ -1035,7 +1153,7 @@ function getFridgeItems() {
         }
 
         // ============================================================
-        // 今日菜单（优化：去除日期显示）
+        // 今日菜单
         // ============================================================
         function generateRandomMenu() {
             const count = parseInt(document.getElementById('dishCount').value) || 3;
@@ -1045,7 +1163,6 @@ function getFridgeItems() {
             setTodayMenu(selected);
         }
 
-        // 注意：手动选菜功能已移除，但保留旧函数以防外部调用
         function showManualSelect() {
             alert('手动选菜功能已移至菜谱详情页，请在菜谱页点击菜名后选择"加入菜单"');
         }
@@ -1075,7 +1192,6 @@ function getFridgeItems() {
             renderTodayMenu();
             renderShoppingList();
             renderRecommend();
-            // 更新详情弹窗按钮状态
             const detailBtn = document.getElementById('detailAddBtn');
             if (detailBtn && detailBtn.dataset.id === recipeId) {
                 detailBtn.textContent = '➕ 加入菜单';
@@ -1109,7 +1225,7 @@ function getFridgeItems() {
         }
 
         // ============================================================
-        // 一键复制今日菜单（优化：缩短分隔线）
+        // 一键复制今日菜单
         // ============================================================
         function copyTodayMenu() {
             const today = appData.today;
@@ -1122,7 +1238,7 @@ function getFridgeItems() {
 
             const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
             let text = `🍳 BeYourChef 今日菜单 (${dateStr})\n`;
-            text += '─'.repeat(12) + '\n'; // 优化：分隔线从20改为12
+            text += '─'.repeat(12) + '\n';
             selectedRecipes.forEach((r, idx) => {
                 text += `${idx+1}. ${r.name}\n`;
                 text += `  食材: ${r.ingredients.join('、')}\n`;
@@ -1165,6 +1281,172 @@ function getFridgeItems() {
         }
 
         // ============================================================
+        // ===== 新增：一周食谱功能 =====
+        // ============================================================
+        function getWeekDays() {
+            const today = new Date();
+            const dayOfWeek = today.getDay(); // 0=周日, 1=周一...
+            const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // 调整到周一
+            const monday = new Date(today);
+            monday.setDate(today.getDate() + diff);
+            const days = [];
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(monday);
+                d.setDate(monday.getDate() + i);
+                const dateStr = d.toISOString().slice(0, 10);
+                const weekdays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+                days.push({
+                    date: dateStr,
+                    label: weekdays[i],
+                    isToday: dateStr === today.toISOString().slice(0, 10)
+                });
+            }
+            return days;
+        }
+
+        function renderWeekPlan() {
+            const container = document.getElementById('weekPlanList');
+            const days = getWeekDays();
+            let html = '';
+            days.forEach(day => {
+                const dishes = appData.weekPlan[day.date] || [];
+                const todayClass = day.isToday ? 'border-l-4 border-orange-400' : '';
+                html += `
+                            <div class="week-day-card ${todayClass}">
+                                <div class="week-day-header">
+                                    <div class="week-day-name">
+                                        ${day.label} <span>${day.date}</span>
+                                    </div>
+                                    <div class="week-day-actions">
+                                        <button onclick="openWeekAddModal('${day.date}')">+ 添加</button>
+                                        <button onclick="clearDayPlan('${day.date}')" style="color:#f87171;">清空</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    ${dishes.length === 0 ? '<div style="color:#d1d5db;font-size:13px;padding:4px 0;">— 暂无安排 —</div>' : ''}
+                                    ${dishes.map(dish => `
+                                        <div class="week-dish-item">
+                                            <span>${dish}</span>
+                                            <span class="del" onclick="removeDishFromWeek('${day.date}','${dish}')">✕</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+            });
+            container.innerHTML = html;
+        }
+
+function openWeekAddModal(date) {
+    weekAddTargetDate = date;
+    const modal = document.getElementById('weekAddModal');
+    const title = document.getElementById('weekAddModalTitle');
+    const weekdays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+    const idx = new Date(date).getDay();
+    const label = weekdays[idx === 0 ? 6 : idx - 1];
+    title.textContent = `📥 添加到${label}（${date}）`;
+    
+    // 清空搜索框
+    document.getElementById('weekSearchInput').value = '';
+    document.getElementById('weekCustomDishInput').value = '';
+    
+    // 渲染完整列表
+    renderWeekAddList('');
+    modal.classList.remove('hidden');
+}
+function filterWeekRecipeList() {
+    const keyword = document.getElementById('weekSearchInput').value.trim();
+    renderWeekAddList(keyword);
+}
+
+function renderWeekAddList(keyword) {
+    const container = document.getElementById('weekAddRecipeList');
+    const date = weekAddTargetDate;
+    let filtered = appData.recipes;
+    if (keyword) {
+        const lowerKeyword = keyword.toLowerCase();
+        filtered = filtered.filter(r => r.name.toLowerCase().includes(lowerKeyword));
+    }
+    
+    let listHtml = '';
+    if (filtered.length === 0) {
+        listHtml = '<p style="color:#9ca3af;padding:12px;text-align:center;">' + 
+                    (keyword ? '没有匹配的菜谱，试试其他关键词' : '暂无菜谱，请先添加菜谱') + 
+                    '</p>';
+    } else {
+        filtered.forEach(r => {
+            const isAdded = (appData.weekPlan[date] || []).includes(r.name);
+            listHtml += `
+                        <div class="recipe-option" onclick="addRecipeToWeek('${date}','${r.name}')">
+                            <span>${r.name}</span>
+                            <span style="font-size:12px;color:#9ca3af;">${isAdded ? '✅ 已添加' : '➕ 添加'}</span>
+                        </div>
+                    `;
+        });
+    }
+    container.innerHTML = listHtml;
+}
+
+        function closeWeekAddModal() {
+            document.getElementById('weekAddModal').classList.add('hidden');
+        }
+
+function addRecipeToWeek(date, recipeName) {
+    if (!appData.weekPlan[date]) appData.weekPlan[date] = [];
+    if (appData.weekPlan[date].includes(recipeName)) {
+        alert('该菜已在当日食谱中');
+        return;
+    }
+    appData.weekPlan[date].push(recipeName);
+    saveData();
+    // 重新渲染列表，保留当前搜索关键词
+    const keyword = document.getElementById('weekSearchInput').value.trim();
+    renderWeekAddList(keyword);
+    renderWeekPlan();
+}
+
+        function addCustomDishToWeek() {
+            const input = document.getElementById('weekCustomDishInput');
+            const name = input.value.trim();
+            if (!name) return alert('请输入菜名');
+            const date = weekAddTargetDate;
+            if (!appData.weekPlan[date]) appData.weekPlan[date] = [];
+            if (appData.weekPlan[date].includes(name)) {
+                alert('该菜已在当日食谱中');
+                return;
+            }
+            appData.weekPlan[date].push(name);
+            saveData();
+            input.value = '';
+            openWeekAddModal(date);
+            renderWeekPlan();
+        }
+
+        function removeDishFromWeek(date, dishName) {
+            if (!appData.weekPlan[date]) return;
+            appData.weekPlan[date] = appData.weekPlan[date].filter(d => d !== dishName);
+            if (appData.weekPlan[date].length === 0) {
+                delete appData.weekPlan[date];
+            }
+            saveData();
+            renderWeekPlan();
+        }
+
+        function clearDayPlan(date) {
+            if (!confirm(`确定清空${date}的所有安排吗？`)) return;
+            delete appData.weekPlan[date];
+            saveData();
+            renderWeekPlan();
+        }
+
+        function clearWeekPlan() {
+            if (!confirm('确定清空本周所有安排吗？')) return;
+            appData.weekPlan = {};
+            saveData();
+            renderWeekPlan();
+        }
+
+        // ============================================================
         // 数据导入/导出
         // ============================================================
         function exportData() {
@@ -1186,6 +1468,7 @@ function getFridgeItems() {
                     const data = JSON.parse(e.target.result);
                     if (data.fridge && data.recipes) {
                         appData = { ...appData, ...data };
+                        if (!appData.weekPlan) appData.weekPlan = {};
                         saveData();
                         alert('✅ 数据导入成功！');
                     } else {
@@ -1211,6 +1494,7 @@ function getFridgeItems() {
             renderTodayMenu();
             renderShoppingList();
             renderRecipeCategorySelect();
+            renderWeekPlan(); // 新增
         }
 
         function renderCategorySelect() {
@@ -1283,7 +1567,6 @@ function getFridgeItems() {
             renderRecipes();
         }
 
-        // ===== 精简版两栏网格菜谱渲染（不显示分类标签） =====
         function renderRecipes() {
             const container = document.getElementById('recipeList');
             let filtered = appData.recipes;
@@ -1305,7 +1588,6 @@ function getFridgeItems() {
         function renderRecommend() {
             const container = document.getElementById('recommendList');
             const recommendations = getRecommendations();
-            // 优化：只展示前10个
             const top10 = recommendations.slice(0, 10);
             const fridgeItems = getFridgeItems();
             const todayIds = appData.today.dishes || [];
@@ -1337,7 +1619,6 @@ function getFridgeItems() {
             }).join('');
         }
 
-        // 优化：今日菜单不显示日期
         function renderTodayMenu() {
             const container = document.getElementById('todayMenu');
             const today = appData.today;
