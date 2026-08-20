@@ -628,22 +628,16 @@
         </div>
     </div>
 
-<!-- 新增：添加菜到周计划弹窗 -->
+<!-- 简洁版：添加菜到周计划弹窗 -->
 <div id="weekAddModal" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 hidden z-50 week-add-modal" onclick="if(event.target===this)closeWeekAddModal()">
     <div class="bg-white rounded-3xl p-6 max-w-sm w-full">
-        <h3 class="text-lg font-bold mb-3" id="weekAddModalTitle">📥 添加到周三</h3>
-        <!-- 新增搜索框 -->
-        <div class="mb-3">
-            <input id="weekSearchInput" placeholder="🔍 搜索菜谱..." class="w-full border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300" oninput="filterWeekRecipeList()" />
+        <h3 class="text-lg font-bold mb-4" id="weekAddModalTitle">📥 添加到周三</h3>
+        <!-- 直接去掉搜索框和菜谱列表，只保留自定义输入 -->
+        <div class="custom-input-area" style="display:flex; gap:10px; padding:0;">
+            <input id="weekCustomDishInput" placeholder="输入菜名" class="flex-1 border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300" />
+            <button onclick="addCustomDishToWeek()" class="bg-orange-500 text-white px-5 py-2 rounded-xl text-sm font-medium">添加</button>
         </div>
-        <div class="modal-content" id="weekAddRecipeList">
-            <!-- 动态渲染 -->
-        </div>
-        <div class="custom-input-area">
-            <input id="weekCustomDishInput" placeholder="输入新菜名（临时记录）" />
-            <button onclick="addCustomDishToWeek()">添加</button>
-        </div>
-        <button onclick="closeWeekAddModal()" class="w-full mt-3 bg-gray-200 py-2 rounded-xl font-medium">关闭</button>
+        <button onclick="closeWeekAddModal()" class="w-full mt-4 bg-gray-200 py-2 rounded-xl font-medium">关闭</button>
     </div>
 </div>
 
@@ -1346,46 +1340,14 @@ function openWeekAddModal(date) {
     const label = weekdays[idx === 0 ? 6 : idx - 1];
     title.textContent = `📥 添加到${label}（${date}）`;
     
-    // 清空搜索框
-    document.getElementById('weekSearchInput').value = '';
+    // 清空输入框
     document.getElementById('weekCustomDishInput').value = '';
     
-    // 渲染完整列表
-    renderWeekAddList('');
+    // 直接显示弹窗
     modal.classList.remove('hidden');
 }
-function filterWeekRecipeList() {
-    const keyword = document.getElementById('weekSearchInput').value.trim();
-    renderWeekAddList(keyword);
-}
 
-function renderWeekAddList(keyword) {
-    const container = document.getElementById('weekAddRecipeList');
-    const date = weekAddTargetDate;
-    let filtered = appData.recipes;
-    if (keyword) {
-        const lowerKeyword = keyword.toLowerCase();
-        filtered = filtered.filter(r => r.name.toLowerCase().includes(lowerKeyword));
-    }
-    
-    let listHtml = '';
-    if (filtered.length === 0) {
-        listHtml = '<p style="color:#9ca3af;padding:12px;text-align:center;">' + 
-                    (keyword ? '没有匹配的菜谱，试试其他关键词' : '暂无菜谱，请先添加菜谱') + 
-                    '</p>';
-    } else {
-        filtered.forEach(r => {
-            const isAdded = (appData.weekPlan[date] || []).includes(r.name);
-            listHtml += `
-                        <div class="recipe-option" onclick="addRecipeToWeek('${date}','${r.name}')">
-                            <span>${r.name}</span>
-                            <span style="font-size:12px;color:#9ca3af;">${isAdded ? '✅ 已添加' : '➕ 添加'}</span>
-                        </div>
-                    `;
-        });
-    }
-    container.innerHTML = listHtml;
-}
+
 
         function closeWeekAddModal() {
             document.getElementById('weekAddModal').classList.add('hidden');
@@ -1405,23 +1367,18 @@ function addRecipeToWeek(date, recipeName) {
     renderWeekPlan();
 }
 
-        function addCustomDishToWeek() {
-            const input = document.getElementById('weekCustomDishInput');
-            const name = input.value.trim();
-            if (!name) return alert('请输入菜名');
-            const date = weekAddTargetDate;
-            if (!appData.weekPlan[date]) appData.weekPlan[date] = [];
-            if (appData.weekPlan[date].includes(name)) {
-                alert('该菜已在当日食谱中');
-                return;
-            }
-            appData.weekPlan[date].push(name);
-            saveData();
-            input.value = '';
-            openWeekAddModal(date);
-            renderWeekPlan();
-        }
-
+        function addRecipeToWeek(date, recipeName) {
+    if (!appData.weekPlan[date]) appData.weekPlan[date] = [];
+    if (appData.weekPlan[date].includes(recipeName)) {
+        alert('该菜已在当日食谱中');
+        return;
+    }
+    appData.weekPlan[date].push(recipeName);
+    saveData();
+    // 保存后关闭弹窗并刷新周计划
+    closeWeekAddModal();
+    renderWeekPlan();
+}
         function removeDishFromWeek(date, dishName) {
             if (!appData.weekPlan[date]) return;
             appData.weekPlan[date] = appData.weekPlan[date].filter(d => d !== dishName);
