@@ -488,6 +488,45 @@
             cursor: pointer;
         }
 
+        /* ===== 购物清单样式 ===== */
+        .shopping-list-container {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        .shopping-list-container h4 {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+        .shopping-list-container .need-buy {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: inline-block;
+            margin: 4px 6px 4px 0;
+        }
+        .shopping-list-container .already-have {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: inline-block;
+            margin: 4px 6px 4px 0;
+        }
+        .shopping-list-container .empty-state {
+            color: #9ca3af;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px 0;
+        }
+
         /* 页面底部留白 */
         #app {
             padding-bottom: 80px !important;
@@ -524,6 +563,10 @@
 
         <!-- 菜谱 -->
         <div id="tab-recipes" class="tab-content hidden">
+            <!-- 搜索框 -->
+            <div class="mb-3">
+                <input id="recipeSearchInput" placeholder="🔍 搜索菜名或食材..." class="w-full border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300" oninput="filterRecipes()" />
+            </div>
             <div class="flex gap-2 mb-3 flex-wrap">
                 <button onclick="showAddRecipe()" class="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm font-medium flex-1">➕ 添加菜谱</button>
                 <button onclick="openCategoryManager('recipe')" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium">📂 管理分类</button>
@@ -562,7 +605,7 @@
                             <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-500"></div>
                             <span class="ml-2 text-sm font-medium text-gray-700">📅 备菜模式</span>
                         </label>
-                        <span class="text-xs text-gray-400">（开启后可分配到下周）</span>
+                        <span class="text-xs text-gray-400">（开启后可分配到具体日期）</span>
                     </div>
                     <div id="categoryQuotaContainer" class="flex flex-wrap gap-3 mb-3">
                         <!-- 由 JS 动态渲染 -->
@@ -579,16 +622,17 @@
                     </div>
                     <div class="flex gap-2 flex-wrap">
                         <button onclick="setGeneratedToToday()" class="flex-1 bg-orange-500 text-white px-4 py-2 rounded-xl text-sm font-medium">📋 设为今日菜单</button>
-                        <button onclick="openAssignToWeek()" class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-medium">📅 分配到下周</button>
+                        <button onclick="openAssignToWeek()" class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-medium">📅 分配到日期</button>
                         <button onclick="cancelAssign()" class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium">取消</button>
                     </div>
                     <!-- 分配细节（默认隐藏） -->
                     <div id="assignDetailArea" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
-                        <p class="text-sm text-gray-500 mb-2">选择每道菜分配到哪天：</p>
-                        <div id="assignDetailList" class="space-y-2 mb-3">
+                        <p class="text-sm text-gray-500 mb-2">选择分配日期：</p>
+                        <input type="date" id="assignDatePicker" class="w-full border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300" />
+                        <div id="assignDetailList" class="space-y-2 mt-3 mb-3">
                             <!-- 由 JS 动态渲染 -->
                         </div>
-                        <button onclick="confirmAssignToWeek()" class="w-full bg-green-500 text-white px-4 py-2 rounded-xl text-sm font-medium">✅ 确认分配</button>
+                        <button onclick="confirmAssignToWeek()" class="w-full bg-green-500 text-white px-4 py-2 rounded-xl text-sm font-medium">✅ 确认分配到所选日期</button>
                     </div>
                 </div>
             </div>
@@ -596,16 +640,27 @@
             <div id="shoppingList" class="mt-4 bg-white rounded-2xl p-4 shadow-sm"></div>
         </div>
 
-        <!-- ===== 新增：本周食谱 ===== -->
+        <!-- ===== 本周食谱 ===== -->
         <div id="tab-week" class="tab-content hidden">
             <div class="flex justify-between items-center mb-3">
                 <h2 class="text-lg font-bold text-gray-700">📅 本周食谱</h2>
-                <button onclick="clearWeekPlan()" class="text-xs text-red-400">清空本周</button>
+                <div class="flex gap-2">
+                    <button onclick="generateWeekShoppingList()" class="text-xs bg-blue-500 text-white px-3 py-1 rounded-full">🛒 生成采购清单</button>
+                    <button onclick="clearWeekPlan()" class="text-xs text-red-400">清空本周</button>
+                </div>
             </div>
             <div id="weekPlanList">
                 <!-- 由 JS 动态渲染 -->
             </div>
             <p class="text-xs text-gray-400 mt-2 text-center">点击「+」添加菜 · 点击菜名旁的 ✕ 删除</p>
+
+            <!-- 本周采购清单 -->
+            <div id="weekShoppingList" class="shopping-list-container" style="display: none;">
+                <h4>🛒 本周采购清单</h4>
+                <div id="weekShoppingContent">
+                    <!-- 由 JS 动态渲染 -->
+                </div>
+            </div>
         </div>
 
         <!-- ===== 底部导航 ===== -->
@@ -760,6 +815,7 @@
         let currentDetailId = null;
         let weekAddTargetDate = '';
         let pendingAssignDishes = [];
+        let recipeSearchKeyword = '';
 
         function loadData() {
             try {
@@ -1198,7 +1254,7 @@
         }
 
         // ============================================================
-        // 按分类随机生成今日菜单
+        // 按分类随机生成
         // ============================================================
 
         function toggleCategoryRandom() {
@@ -1268,7 +1324,7 @@
             if (isMealPrep) {
                 pendingAssignDishes = selectedDishes.map(d => ({
                     ...d,
-                    targetDay: '周三'
+                    targetDate: ''
                 }));
                 document.getElementById('assignArea').style.display = 'block';
                 document.getElementById('assignDetailArea').style.display = 'none';
@@ -1277,6 +1333,14 @@
                 const desc = document.querySelector('#categoryRandomArea .text-gray-500');
                 if (desc) desc.style.display = 'none';
                 document.getElementById('assignCount').textContent = pendingAssignDishes.length;
+                // 设置日期选择器默认值为下周一（以周一为每周第一天）
+                const today = new Date();
+                const dayOfWeek = today.getDay(); // 0=周日
+                const daysUntilMonday = (dayOfWeek === 0) ? 1 : 8 - dayOfWeek;
+                const nextMonday = new Date(today);
+                nextMonday.setDate(today.getDate() + daysUntilMonday);
+                const dateStr = nextMonday.toISOString().slice(0, 10);
+                document.getElementById('assignDatePicker').value = dateStr;
             } else {
                 const dishIds = selectedDishes.map(d => d.id);
                 appData.today.dishes = dishIds;
@@ -1285,7 +1349,7 @@
                 renderTodayMenu();
                 renderShoppingList();
                 document.getElementById('categoryRandomArea').style.display = 'none';
-                alert(`✅ 已生成 ${selectedDishes.length} 道菜，设为今日菜单！`);
+                // 非备菜模式：不弹窗
             }
         }
 
@@ -1293,9 +1357,25 @@
         function renderAssignListSimple() {
             const container = document.getElementById('assignList');
             if (!container) return;
-            container.innerHTML = pendingAssignDishes.map(d => `
-                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">${d.name}</span>
+            container.innerHTML = pendingAssignDishes.map((d, index) => `
+                <div class="flex items-center gap-1 bg-gray-100 px-3 py-1 rounded-full text-sm">
+                    <span>${d.name}</span>
+                    <span class="text-red-400 cursor-pointer font-bold" onclick="removeFromPending(${index})">✕</span>
+                </div>
             `).join('');
+        }
+
+        function removeFromPending(index) {
+            pendingAssignDishes.splice(index, 1);
+            if (pendingAssignDishes.length === 0) {
+                document.getElementById('assignArea').style.display = 'none';
+                document.getElementById('categoryQuotaContainer').style.display = 'flex';
+                const desc = document.querySelector('#categoryRandomArea .text-gray-500');
+                if (desc) desc.style.display = 'block';
+                return;
+            }
+            document.getElementById('assignCount').textContent = pendingAssignDishes.length;
+            renderAssignListSimple();
         }
 
         function setGeneratedToToday() {
@@ -1322,6 +1402,12 @@
                 alert('没有菜可以分配');
                 return;
             }
+            // 检查是否选择了日期
+            const datePicker = document.getElementById('assignDatePicker');
+            if (!datePicker.value) {
+                alert('请先选择分配日期');
+                return;
+            }
             renderAssignDetailList();
             document.getElementById('assignDetailArea').style.display = 'block';
         }
@@ -1329,13 +1415,10 @@
         function renderAssignDetailList() {
             const container = document.getElementById('assignDetailList');
             if (!container) return;
-            const weekdays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
             container.innerHTML = pendingAssignDishes.map((dish, index) => `
                 <div class="flex items-center justify-between gap-2 p-2 bg-gray-50 rounded-xl">
                     <span class="text-sm">${dish.name}</span>
-                    <select class="border rounded-lg px-2 py-1 text-sm" onchange="pendingAssignDishes[${index}].targetDay = this.value">
-                        ${weekdays.map(day => `<option value="${day}" ${day === dish.targetDay ? 'selected' : ''}>${day}</option>`).join('')}
-                    </select>
+                    <span class="text-red-400 cursor-pointer font-bold" onclick="removeFromPending(${index}); renderAssignDetailList();">✕</span>
                 </div>
             `).join('');
         }
@@ -1346,31 +1429,19 @@
                 return;
             }
 
-            const today = new Date();
-            const dayOfWeek = today.getDay();
-            const diffToNextMonday = (dayOfWeek === 0 ? 1 : 8 - dayOfWeek);
-            const nextMonday = new Date(today);
-            nextMonday.setDate(today.getDate() + diffToNextMonday);
+            const datePicker = document.getElementById('assignDatePicker');
+            const targetDate = datePicker.value;
+            if (!targetDate) {
+                alert('请先选择分配日期');
+                return;
+            }
 
-            const dayOffsetMap = { '周一': 0, '周二': 1, '周三': 2, '周四': 3, '周五': 4, '周六': 5, '周日': 6 };
-
-            const grouped = {};
-            pendingAssignDishes.forEach(dish => {
-                const offset = dayOffsetMap[dish.targetDay] || 0;
-                const targetDate = new Date(nextMonday);
-                targetDate.setDate(nextMonday.getDate() + offset);
-                const dateStr = targetDate.toISOString().slice(0, 10);
-                if (!grouped[dateStr]) grouped[dateStr] = [];
-                grouped[dateStr].push(dish.name);
-            });
-
-            Object.keys(grouped).forEach(dateStr => {
-                if (!appData.weekPlan[dateStr]) appData.weekPlan[dateStr] = [];
-                grouped[dateStr].forEach(name => {
-                    if (!appData.weekPlan[dateStr].includes(name)) {
-                        appData.weekPlan[dateStr].push(name);
-                    }
-                });
+            const dishNames = pendingAssignDishes.map(d => d.name);
+            if (!appData.weekPlan[targetDate]) appData.weekPlan[targetDate] = [];
+            dishNames.forEach(name => {
+                if (!appData.weekPlan[targetDate].includes(name)) {
+                    appData.weekPlan[targetDate].push(name);
+                }
             });
 
             saveData();
@@ -1384,7 +1455,7 @@
             renderWeekPlan();
             renderTodayMenu();
             renderShoppingList();
-            alert('✅ 已成功分配到下周食谱！');
+            alert(`✅ 已成功分配到 ${targetDate}！`);
         }
 
         function cancelAssign() {
@@ -1397,6 +1468,81 @@
             if (desc) desc.style.display = 'block';
         }
 
+        // ============================================================
+        // 菜谱搜索
+        // ============================================================
+        function filterRecipes() {
+            const input = document.getElementById('recipeSearchInput');
+            recipeSearchKeyword = input.value.trim().toLowerCase();
+            renderRecipes();
+        }
+
+        // ============================================================
+        // 本周购物清单
+        // ============================================================
+        function generateWeekShoppingList() {
+            const container = document.getElementById('weekShoppingList');
+            const content = document.getElementById('weekShoppingContent');
+            
+            // 收集本周所有菜谱
+            const allDishes = [];
+            for (const date in appData.weekPlan) {
+                appData.weekPlan[date].forEach(name => {
+                    // 查找菜谱
+                    const recipe = appData.recipes.find(r => r.name === name);
+                    if (recipe) {
+                        allDishes.push(recipe);
+                    }
+                });
+            }
+
+            if (allDishes.length === 0) {
+                content.innerHTML = '<div class="empty-state">本周暂无食谱，请先添加菜品</div>';
+                container.style.display = 'block';
+                return;
+            }
+
+            // 汇总食材
+            const ingredientMap = {};
+            allDishes.forEach(recipe => {
+                recipe.ingredients.forEach(ing => {
+                    if (!ingredientMap[ing]) ingredientMap[ing] = 0;
+                    ingredientMap[ing]++;
+                });
+            });
+
+            const allIngredients = Object.keys(ingredientMap);
+            const fridgeItems = getFridgeItems();
+            const needBuy = [];
+            const alreadyHave = [];
+
+            allIngredients.forEach(ing => {
+                if (fridgeItems.includes(ing)) {
+                    alreadyHave.push(ing);
+                } else {
+                    needBuy.push(ing);
+                }
+            });
+
+            let html = '';
+            if (needBuy.length > 0) {
+                html += `<div class="mb-2"><span class="font-medium text-sm text-red-600">需要购买：</span></div>`;
+                html += `<div>${needBuy.map(ing => `<span class="need-buy">${ing}</span>`).join('')}</div>`;
+            } else {
+                html += `<div class="text-green-600 text-sm mb-2">🎉 所有食材冰箱里都有！</div>`;
+            }
+            if (alreadyHave.length > 0) {
+                html += `<div class="mt-2"><span class="font-medium text-sm text-green-600">冰箱已有：</span></div>`;
+                html += `<div>${alreadyHave.map(ing => `<span class="already-have">${ing}</span>`).join('')}</div>`;
+            }
+
+            content.innerHTML = html;
+            container.style.display = 'block';
+        }
+
+        // ============================================================
+        // 今日菜单相关
+        // ============================================================
         function showManualSelect() {
             alert('手动选菜功能已移至菜谱详情页，请在菜谱页点击菜名后选择"加入菜单"');
         }
@@ -1515,12 +1661,12 @@
         }
 
         // ============================================================
-        // ===== 新增：一周食谱功能 =====
+        // 一周食谱功能
         // ============================================================
         function getWeekDays() {
             const today = new Date();
-            const dayOfWeek = today.getDay(); // 0=周日, 1=周一...
-            const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // 调整到周一
+            const dayOfWeek = today.getDay();
+            const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
             const monday = new Date(today);
             monday.setDate(today.getDate() + diff);
             const days = [];
@@ -1603,6 +1749,8 @@
             input.value = '';
             openWeekAddModal(date);
             renderWeekPlan();
+            // 隐藏之前的购物清单
+            document.getElementById('weekShoppingList').style.display = 'none';
         }
 
         function removeDishFromWeek(date, dishName) {
@@ -1613,6 +1761,7 @@
             }
             saveData();
             renderWeekPlan();
+            document.getElementById('weekShoppingList').style.display = 'none';
         }
 
         function clearDayPlan(date) {
@@ -1620,6 +1769,7 @@
             delete appData.weekPlan[date];
             saveData();
             renderWeekPlan();
+            document.getElementById('weekShoppingList').style.display = 'none';
         }
 
         function clearWeekPlan() {
@@ -1627,6 +1777,7 @@
             appData.weekPlan = {};
             saveData();
             renderWeekPlan();
+            document.getElementById('weekShoppingList').style.display = 'none';
         }
 
         // ============================================================
@@ -1755,6 +1906,14 @@
             let filtered = appData.recipes;
             if (currentRecipeFilter !== '全部') {
                 filtered = filtered.filter(r => r.category === currentRecipeFilter);
+            }
+            // 搜索过滤
+            if (recipeSearchKeyword) {
+                filtered = filtered.filter(r => {
+                    const nameMatch = r.name.toLowerCase().includes(recipeSearchKeyword);
+                    const ingMatch = r.ingredients.some(ing => ing.toLowerCase().includes(recipeSearchKeyword));
+                    return nameMatch || ingMatch;
+                });
             }
             if (filtered.length === 0) {
                 container.innerHTML = '<p class="text-gray-400 text-sm text-center py-8 col-span-2">暂无菜谱，点击上方添加 📝</p>';
