@@ -541,20 +541,30 @@
         </div>
 
         <!-- 今日菜单 -->
-        <div id="tab-menu" class="tab-content hidden">
-            <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
-                <div class="flex items-center gap-3 flex-wrap">
-                    <label class="text-sm font-medium">今天吃几个菜？</label>
-                    <input id="dishCount" type="number" value="3" min="1" max="6" class="w-16 border rounded-xl px-3 py-1 text-center">
-                </div>
-                <div class="flex gap-2 mt-2">
-                    <button onclick="generateRandomMenu()" class="flex-1 bg-orange-500 text-white px-5 py-2 rounded-xl text-sm font-medium">🎲 随机生成</button>
-                </div>
-            </div>
-            <div id="todayMenu" class="bg-white rounded-2xl p-4 shadow-sm"></div>
-            <div id="shoppingList" class="mt-4 bg-white rounded-2xl p-4 shadow-sm"></div>
+<div id="tab-menu" class="tab-content hidden">
+    <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+        <div class="flex items-center gap-3 flex-wrap">
+            <label class="text-sm font-medium">今天吃几个菜？</label>
+            <input id="dishCount" type="number" value="3" min="1" max="6" class="w-16 border rounded-xl px-3 py-1 text-center">
+        </div>
+        <div class="flex gap-2 mt-2 flex-wrap">
+            <button onclick="generateRandomMenu()" class="flex-1 bg-orange-500 text-white px-5 py-2 rounded-xl text-sm font-medium">🎲 随机生成</button>
+            <button onclick="toggleCategoryRandom()" class="flex-1 bg-blue-500 text-white px-5 py-2 rounded-xl text-sm font-medium">📂 分类随机</button>
         </div>
 
+        <!-- 分类随机配置区域（默认折叠） -->
+        <div id="categoryRandomArea" style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+            <p class="text-sm text-gray-500 mb-2">设置每个分类需要几道菜：</p>
+            <div id="categoryQuotaContainer" class="flex flex-wrap gap-3 mb-3">
+                <!-- 由 JS 动态渲染 -->
+            </div>
+            <button onclick="generateByCategory()" class="w-full bg-green-500 text-white px-5 py-2 rounded-xl text-sm font-medium">✅ 按分类生成</button>
+            <button onclick="toggleCategoryRandom()" class="w-full mt-2 text-sm text-gray-400">收起</button>
+        </div>
+    </div>
+    <div id="todayMenu" class="bg-white rounded-2xl p-4 shadow-sm"></div>
+    <div id="shoppingList" class="mt-4 bg-white rounded-2xl p-4 shadow-sm"></div>
+</div>
         <!-- ===== 新增：本周食谱 ===== -->
         <div id="tab-week" class="tab-content hidden">
             <div class="flex justify-between items-center mb-3">
@@ -1155,7 +1165,88 @@
             const selected = shuffled.slice(0, Math.min(count, shuffled.length));
             setTodayMenu(selected);
         }
+// ============================================================
+// 按分类随机生成今日菜单
+// ============================================================
 
+// 切换分类随机区域的显示/隐藏
+function toggleCategoryRandom() {
+    const area = document.getElementById('categoryRandomArea');
+    if (area.style.display === 'none') {
+        area.style.display = 'block';
+        renderCategoryQuotas();
+    } else {
+        area.style.display = 'none';
+    }
+}
+
+// 渲染分类配额输入框
+function renderCategoryQuotas() {
+    const container = document.getElementById('categoryQuotaContainer');
+    const categories = appData.recipeCategories;
+    // 如果还没有存储配额值，初始化一个空对象
+    if (!window._quotaValues) {
+        window._quotaValues = {};
+        categories.forEach(cat => { window._quotaValues[cat] = 0; });
+    }
+    container.innerHTML = categories.map(cat => `
+        <div class="flex items-center gap-1">
+            <label class="text-sm text-gray-600">${cat}</label>
+            <input type="number" min="0" max="10" value="${window._quotaValues[cat] || 0}" 
+                   class="w-12 border rounded-lg px-2 py-1 text-center text-sm"
+                   onchange="window._quotaValues['${cat}'] = parseInt(this.value) || 0" />
+        </div>
+    `).join('');
+}
+
+// 按分类随机生成
+function generateByCategory() {
+    const quotas = window._quotaValues || {};
+    const categories = appData.recipeCategories;
+    const selectedDishes = [];
+    const errors = [];
+
+    categories.forEach(cat => {
+        const count = quotas[cat] || 0;
+        if (count === 0) return;
+        
+        // 从该分类中筛选菜谱
+        const available = appData.recipes.filter(r => r.category === cat);
+        if (available.length === 0) {
+            errors.push(`「${cat}」分类下没有菜谱`);
+            return;
+        }
+        if (available.length < count) {
+            errors.push(`「${cat}」分类只有 ${available.length} 道菜，不够 ${count} 道`);
+            return;
+        }
+        
+        // 随机抽取 count 道
+        const shuffled = [...available].sort(() => Math.random() - 0.5);
+        const selected = shuffled.slice(0, count);
+        selectedDishes.push(...selected);
+    });
+
+    if (errors.length > 0) {
+        alert('⚠️ 生成失败：\n' + errors.join('\n'));
+        return;
+    }
+
+    if (selectedDishes.length === 0) {
+        alert('请至少设置一个分类的配额数量');
+        return;
+    }
+
+    // 设置今日菜单
+    setTodayMenu(selectedDishes);
+    // 折叠配置区域
+    document.getElementById('categoryRandomArea').style.display = 'none';
+    // 刷新今日菜单显示
+    renderTodayMenu();
+    renderShoppingList();
+    // 提示
+    alert(`✅ 已生成 ${selectedDishes.length} 道菜！`);
+}
         function showManualSelect() {
             alert('手动选菜功能已移至菜谱详情页，请在菜谱页点击菜名后选择"加入菜单"');
         }
