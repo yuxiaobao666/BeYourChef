@@ -859,6 +859,23 @@
             return JSON.parse(JSON.stringify(defaultData));
         }
 
+        async function fetchCloudData() {
+            if (!CLOUD_ENABLED) return null;
+            try {
+                const res = await fetch(CLOUD_API_URL, { cache: 'no-store' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                if (data && data.fridge) {
+                    try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (e) {}
+                    return data;
+                }
+                return {};
+            } catch (e) {
+                console.warn('[cloud] fetch failed:', e);
+                return null;
+            }
+        }
+
         async function saveData() {
             try { localStorage.setItem(CACHE_KEY, JSON.stringify(appData)); } catch (e) {}
             renderAll();
@@ -888,11 +905,6 @@
             if (res.status === 401) { const e = new Error('密码错误'); e.code = 401; throw e; }
             if (!res.ok) throw new Error('HTTP ' + res.status);
             return res.json();
-        }
-
-        function saveData() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-            renderAll();
         }
 
         function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
