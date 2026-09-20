@@ -1749,6 +1749,10 @@
                     if (data.fridge && data.recipes) {
                         appData = { ...appData, ...data };
                         if (!appData.weekPlan) appData.weekPlan = {};
+                        if (CLOUD_ENABLED && !sessionStorage.getItem('chef_write_token')) {
+                            const token = prompt('请输入编辑密码（用于同步到云端）：');
+                            if (token) sessionStorage.setItem('chef_write_token', token);
+                        }
                         saveData();
                         alert('✅ 数据导入成功！');
                     } else {
