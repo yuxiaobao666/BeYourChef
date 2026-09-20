@@ -581,7 +581,7 @@
         <div class="flex items-center justify-between mb-4">
             <h1 class="text-2xl font-bold text-orange-600">🍳 BeYourChef</h1>
             <div class="flex gap-2">
-                <button onclick="exportData()" class="text-sm bg-gray-200 px-3 py-1 rounded-full">📤导出</button>
+                <span id="cloudStatus" class="text-xs text-green-600"></span>  <button onclick="exportData()" class="text-sm bg-gray-200 px-3 py-1 rounded-full">📤导出</button>
                 <button onclick="document.getElementById('importInput').click()" class="text-sm bg-gray-200 px-3 py-1 rounded-full">📥导入</button>
                 <input type="file" id="importInput" accept=".json" class="hidden" onchange="importData(event)">
             </div>
@@ -782,6 +782,14 @@
         // 数据层
         // ============================================================
         const STORAGE_KEY = 'cookAppData';
+        const CACHE_KEY = 'cookAppData_cloud_cache';
+        const CLOUD_API_URL = '/api/data';
+        const CLOUD_ENABLED = true;
+
+        function setStatus(text) {
+          const el = document.getElementById('cloudStatus');
+          if (el) el.textContent = text;
+        }
 
         const defaultData = {
             fridge: {
@@ -823,16 +831,16 @@
             weekPlan: {}
         };
 
-        let appData = loadData();
+        let appData = {};
         let currentCategoryContext = 'fridge';
         let currentDetailId = null;
         let weekAddTargetDate = '';
         let recipeSearchKeyword = '';
         let matchData = []; // 存储匹配确认数据
 
-        function loadData() {
+        function loadLocalData() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEY);
+                const raw = localStorage.getItem(CACHE_KEY) || localStorage.getItem(STORAGE_KEY);
                 if (raw) {
                     const parsed = JSON.parse(raw);
                     if (Array.isArray(parsed.fridge)) {
@@ -849,6 +857,37 @@
                 }
             } catch (e) { console.warn('数据加载失败，使用默认数据'); }
             return JSON.parse(JSON.stringify(defaultData));
+        }
+
+        async function saveData() {
+            try { localStorage.setItem(CACHE_KEY, JSON.stringify(appData)); } catch (e) {}
+            renderAll();
+            if (!CLOUD_ENABLED) { setStatus(''); return; }
+            const token = sessionStorage.getItem('chef_write_token');
+            if (!token) { setStatus('💾 本地已保存'); return; }
+            try {
+                await pushCloudData(token);
+                setStatus('☁️ 已同步');
+            } catch (e) {
+                if (e.code === 401) {
+                    sessionStorage.removeItem('chef_write_token');
+                    setStatus('❌ 密码错误');
+                } else {
+                    setStatus('📴 网络异常');
+                }
+            }
+        }
+
+        async function pushCloudData(token) {
+            if (!CLOUD_ENABLED) return { skipped: true };
+            const res = await fetch(CLOUD_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Write-Token': token },
+                body: JSON.stringify(appData)
+            });
+            if (res.status === 401) { const e = new Error('密码错误'); e.code = 401; throw e; }
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
         }
 
         function saveData() {
@@ -1129,6 +1168,10 @@
                     ingredients,
                     steps: steps || '暂无步骤'
                 });
+            }
+            if (CLOUD_ENABLED && !sessionStorage.getItem('chef_write_token')) {
+                const token = prompt('请输入编辑密码（用于同步到云端）：');
+                if (token) sessionStorage.setItem('chef_write_token', token);
             }
             saveData();
             closeModal();
@@ -1924,7 +1967,20 @@
         // ============================================================
         // 启动
         // ============================================================
-        switchTab('fridge');
+        async function bootstrap() {
+            setStatus('⏳ 同步中...');
+            const cloud = await fetchCloudData();
+            if (cloud && cloud.fridge) {
+                appData = cloud;
+                setStatus('☁️ 已同步');
+            } else {
+                appData = loadLocalData();
+                setStatus('📴 本地模式');
+            }
+            switchTab('fridge');
+        }
+
+        bootstrap();
     </script>
 
 </body>
