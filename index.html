@@ -880,7 +880,11 @@
             try { localStorage.setItem(CACHE_KEY, JSON.stringify(appData)); } catch (e) {}
             renderAll();
             if (!CLOUD_ENABLED) { setStatus(''); return; }
-            const token = sessionStorage.getItem('chef_write_token');
+            let token = sessionStorage.getItem('chef_write_token');
+            if (!token) {
+                token = prompt('请输入编辑密码（用于同步到云端）：');
+                if (token) sessionStorage.setItem('chef_write_token', token);
+            }
             if (!token) { setStatus('💾 本地已保存'); return; }
             try {
                 await pushCloudData(token);
